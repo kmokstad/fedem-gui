@@ -517,6 +517,9 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_create1ordTF"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_create2ordTF"));
 
+  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createBandStop"));
+
   //solve
   this->solveMainHeader.clear();
 

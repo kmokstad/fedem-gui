@@ -25,7 +25,7 @@
 
 void FapCtrl3DObjCmds::init()
 {
-  FFuaCmdItem* cmdItem = 0;
+  FFuaCmdItem* cmdItem;
 
   cmdItem = new FFuaCmdItem("cmdId_ctrl3DObj_createInput");
   cmdItem->setSmallIcon(ctrlElemIn_xpm);
@@ -209,6 +209,13 @@ void FapCtrl3DObjCmds::init()
   cmdItem->setActivatedCB(FFaDynCB0S(FapCtrl3DObjCmds::create2ordTF));
   cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCtrl3DObjCmds::getSensitivity,bool&));
 
+  cmdItem = new FFuaCmdItem("cmdId_ctrl3DObj_createBandStop");
+  cmdItem->setSmallIcon(ctrlBandStop_xpm);
+  cmdItem->setText("Band Stop Filter");
+  cmdItem->setToolTip("Band Stop Filter");
+  cmdItem->setActivatedCB(FFaDynCB0S(FapCtrl3DObjCmds::createBandStop));
+  cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCtrl3DObjCmds::getSensitivity,bool&));
+
   cmdItem = new FFuaCmdItem("cmdId_ctrl3DObj_rotate");
   cmdItem->setSmallIcon(ctrlRotate_xpm);
   cmdItem->setText("Flip Element Direction");
@@ -386,6 +393,12 @@ void FapCtrl3DObjCmds::create1ordTF()
 void FapCtrl3DObjCmds::create2ordTF()
 {
   FapCtrl3DObjCmds::ctrlCreate(Fmc2ordTF::getClassTypeID());
+}
+//----------------------------------------------------------------------------
+
+void FapCtrl3DObjCmds::createBandStop()
+{
+  FapCtrl3DObjCmds::ctrlCreate(FmcBandStop::getClassTypeID());
 }
 //----------------------------------------------------------------------------
 

@@ -5,15 +5,15 @@
 // This file is part of FEDEM - https://openfedem.org
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef FAPCTRL3DOBJCMDS_H
-#define FAPCTRL3DOBJCMDS_H
+#ifndef FAP_CTRL_3D_OBJ_CMDS_H
+#define FAP_CTRL_3D_OBJ_CMDS_H
+
 #include "FapCmdsBase.H"
 #include "FFaLib/FFaPatterns/FFaInitialisation.H"
 
-class FapCtrl3DObjCmds: public FapCmdsBase
+
+class FapCtrl3DObjCmds : public FapCmdsBase
 {
-// Operations
-private:
   static void init();
 
   // creation
@@ -54,30 +54,21 @@ private:
   static void create1ordTF();
   static void create2ordTF();
 
+  static void createBandStop();
+
+  static void ctrlCreate(int elemType);
+
   // operation
   static void rotate();
   static void addPoint();
   static void removePoint();
 
-  //misc
-  static void ctrlCreate(int elemType);
+  // sensitivity
+  static void getSensitivity(bool& isSensitive);
 
-  // Sensitivity :
-  static void getSensitivity(bool & isSensitive);
-
-// Attributes
-private:
   friend class FFaInitialisation<FapCtrl3DObjCmds>;
 };
 
 static FFaInitialisation<FapCtrl3DObjCmds> FapCtrl3DObjCmdsInit;
 
-
-
-/////////////////////////////////////////////////////////////////////////////
-
 #endif
-
-
-
-

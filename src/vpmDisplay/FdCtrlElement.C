@@ -144,6 +144,8 @@ bool FdCtrlElement::updateFdDetails()
       this->setElemText("1'order", 0.25f);
     else if (itsFmOwner->isOfType(Fmc2ordTF::getClassTypeID()))
       this->setElemText("2'order", 0.25f);
+    else if (itsFmOwner->isOfType(FmcBandStop::getClassTypeID()))
+      this->setElemText("Bnd stp", 0.25f);
     else
       this->setElemText("Fault", 0.3f);
   }
