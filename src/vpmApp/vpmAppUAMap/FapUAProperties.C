@@ -462,9 +462,15 @@ void FapUAProperties::getDBValues(FFuaUIValues* values)
       pv->myObjToPosition = item;
       pv->isSlave = item->isSlaveTriad(true);
       pv->isMaster = item->isMasterTriad();
-      pv->myTriadIsAttached = item->isAttached();
       pv->myTriadConnector = item->itsConnectorType.getValue();
-      pv->myFENodeIdx = pv->myTriadIsAttached ? std::to_string(item->FENodeNo.getValue()) : "N/A";
+      if (item->isAttached()) {
+        pv->myTriadDofs = item->itsNDOFs.getValue();
+        pv->myFENodeIdx = item->FENodeNo.getValue();
+      }
+      else {
+        pv->myTriadDofs = 0;
+        pv->myFENodeIdx = -1;
+      }
 
       int dof, nDOFs = item->getNDOFs(true);
       pv->myTriadVals.resize(nDOFs);
@@ -2494,6 +2500,18 @@ bool FapUAProperties::setDBValues(FmModelMemberBase* fmItem,
 
       if (pv->myTriadConnector > 0)
 	item->updateConnector((FmTriad::ConnectorType)pv->myTriadConnector);
+
+      if (pv->myTriadDofs == 6 || pv->myTriadDofs == -3)
+        if (item->itsNDOFs.setValue(pv->myTriadDofs))
+        {
+          FmPart* owner = item->getOwnerFEPart();
+          if (owner)
+          {
+            FFlNode* node = owner->getNode(item->FENodeNo.getValue());
+            if (node && node->setStatus(pv->myTriadDofs == -3 ? 13 : 1))
+              owner->delayedCheckSumUpdate();
+          }
+        }
 
       bool updateIcon = false;
       int  dof, nDOFs = item->getNDOFs(true);

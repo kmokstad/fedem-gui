@@ -99,6 +99,8 @@ protected:
   FFuLabelField* myDescriptionField;
   FFuLabelField* myTagField;
 
+  // Topology Panel
+
   FuiTopologyView* myTopologyView;
   FFuToolButton*   backBtn;
   FFuToolButton*   forwardBtn;
@@ -116,14 +118,11 @@ protected:
   FFuLabelFrame* myHPRatioFrame;
   FFuIOField*    myHPRatioField;
 
-  // Advanced spring characteristics
-
-  FuiSpringChar* mySpringChar;
-
   // Spring & Damper
 
   FuiSprDaForce*    mySpringForce;
   FuiSpringDefCalc* mySpringDeflCalc;
+  FuiSpringChar*    mySpringChar;
   FuiSprDaForce*    myDamperForce;
 
   // Part
@@ -159,10 +158,12 @@ protected:
   FFuLabel*           myShaftNoteALabel;
   FFuLabel*           myShaftNoteBLabel;
   FFuLabel*           myShaftNoteCLabel;
+
   FFuToggleButton*    myVisualize3DButton;
   FFuLabelField*      myVisualize3DStartAngleField;
   FFuLabelField*      myVisualize3DStopAngleField;
-  FFuLabelFrame*      myBeamOrientationFrame;
+
+  FFuLabelFrame*               myBeamOrientationFrame;
   std::array<FFuLabelField*,3> myBeamLocalZField;
 
   // Turbine
@@ -222,11 +223,12 @@ protected:
   std::string           mySelectedJointTab;
   int                   mySelectedJointDof;
 
-  FuiJointSummary*     myJointSummary;
-  FuiPositionData*     myJointPosition;
+  FuiJointSummary*      myJointSummary;
+  FuiPositionData*      myJointPosition;
+  FuiJointTabAdvanced*  myJointAdvancedTab;
+  FuiJointResults*      myJointResults;
+
   std::array<FuiJointDOF*,6> myJointDofs;
-  FuiJointTabAdvanced* myJointAdvancedTab;
-  FuiJointResults*     myJointResults;
 
   // Pipe Surface
 
@@ -578,7 +580,7 @@ public:
     myBlankFieldsFlags    = 0;
 
     isSlave = isMaster    = false;
-    myTriadIsAttached     = false;
+    myTriadDofs           = 0;
     myTriadConnector      = 0;
     mySysDir              = 0;
 
@@ -601,6 +603,8 @@ public:
   std::string myDescription;
   std::string myTag;
 
+  // Topology panel :
+
   std::vector<FuiTopologyItem> myTopology;
 
   FFaDynCB2<int,bool> myTopologyHighlightCB;
@@ -620,8 +624,8 @@ public:
 
   // Axial Damper :
 
-  bool                 showAxialDamper;
-  FuiSprDaForceValues  myAxialDaForceValues;
+  bool                showAxialDamper;
+  FuiSprDaForceValues myAxialDaForceValues;
 
   // Axial Spring :
 
@@ -642,23 +646,23 @@ public:
 
   // User-defined element and Beam :
 
-  bool                  showUDEData;
-  bool                  showBeamData;
-  double                myTotalLength; // read-only
-  double                myTotalMass; // read-only
-  FFuaQueryBase*        myCrossSectionQuery;
-  FmModelMemberBase*    mySelectedCS;
-  bool                  myHideCrossSection;
-  bool                  myVisualize3DEnabled;
-  bool                  myVisualize3D;
-  int                   myVisualize3Dts;
-  std::pair<int,int>    myVisualize3DAngles;
-  double                myMassPropDamp;
-  double                myStifPropDamp;
-  double                myScaleMass;
-  double                myScaleStiff;
-  FaVec3                myOrientation;
-  int                   myBlankFieldsFlags; // specifies what fields are blank
+  bool               showUDEData;
+  bool               showBeamData;
+  double             myTotalLength;
+  double             myTotalMass;
+  FFuaQueryBase*     myCrossSectionQuery;
+  FmModelMemberBase* mySelectedCS;
+  bool               myHideCrossSection;
+  bool               myVisualize3DEnabled;
+  bool               myVisualize3D;
+  int                myVisualize3Dts;
+  std::pair<int,int> myVisualize3DAngles;
+  double             myMassPropDamp;
+  double             myStifPropDamp;
+  double             myScaleMass;
+  double             myScaleStiff;
+  FaVec3             myOrientation;
+  int                myBlankFieldsFlags;
 
   // Wind turbine :
 
@@ -707,42 +711,44 @@ public:
 
   // Riser, Jacket and Soil Pile :
 
-  bool                showRiserData;
-  bool                showJacketData;
-  bool                showSoilPileData;
-  bool                myIntFluid;
-  double              myIntFluidDensity;
-  double              myIntFluidLevel;
+  bool   showRiserData;
+  bool   showJacketData;
+  bool   showSoilPileData;
+  bool   myIntFluid;
+  double myIntFluidDensity;
+  double myIntFluidLevel;
 
   // Triad :
 
-  bool   showTriadData;
-  bool   isSlave;
-  bool   isMaster;
-  bool   myTriadIsAttached;
-  char   myTriadConnector;
-  char   mySysDir;
-  std::string myFENodeIdx;
-  std::array<double,4> myMass;
+  bool showTriadData;
+  bool isSlave;
+  bool isMaster;
+  int  myFENodeIdx;
+  char myTriadDofs;
+  char myTriadConnector;
+  char mySysDir;
 
-  FFaDynCB2<int,int> myDofStatusCB;
+  std::array<double,4> myMass;
 
   std::vector<FuiTriadDOFValues> myTriadVals;
   std::vector<bool>              myResToggles;
 
+  FFaDynCB2<int,int> myDofStatusCB;
+
   // Joint :
 
-  char   showJointData;
+  char showJointData;
+  bool showSwapTriadButton;
+  bool showAddMasterButton;
+  bool showReverseMasterButton;
+
+  FmModelMemberBase* myObjToPosition;
+
   std::vector<FuiJointDOFValues> myJointVals;
 
-  bool   showSwapTriadButton;
-  bool   showAddMasterButton;
-  bool   showReverseMasterButton;
   FFaDynCB0 mySwapTriadCB;
   FFaDynCB0 myAddMasterCB;
   FFaDynCB0 myRevMasterCB;
-  FmModelMemberBase* myObjToPosition;
-
   FFaDynCB0 myDofSetAllFreeCB;
   FFaDynCB0 myDofSetAllFixedCB;
 
@@ -820,41 +826,41 @@ public:
 
   // Generic DB Object
 
-  bool           showGenDBObj;
-  std::string    myGenDBObjType;
-  std::string    myGenDBObjDef;
+  bool        showGenDBObj;
+  std::string myGenDBObjType;
+  std::string myGenDBObjDef;
 
   // File Reference
 
-  bool           showFileReference;
-  std::string    myFileReferenceName;
-  std::string    myModelFilePath;
+  bool        showFileReference;
+  std::string myFileReferenceName;
+  std::string myModelFilePath;
 
   // Tire
 
   bool                  showTireData;
   FFaDynCB0             myBrowseTireFileCB;
-  FFuaQueryBase       * myTireDataFileRefQuery;
-  FFuaQueryBase       * myRoadQuery;
+  FFuaQueryBase*        myTireDataFileRefQuery;
+  FFuaQueryBase*        myRoadQuery;
   std::vector<std::string> myTireTypes;
   double                mySpindelTriadOffset;
   std::string           mySelectedTireModelType;
-  FmModelMemberBase   * mySelectedRoad;
-  FmModelMemberBase   * mySelectedTireDataFileRef;
+  FmModelMemberBase*    mySelectedRoad;
+  FmModelMemberBase*    mySelectedTireDataFileRef;
   std::string           myTireDataFileName;
 
   // Road
 
   bool                  showRoadData;
   bool                  iAmUsingExtRoadData;
-  FFuaQueryBase       * myRoadFunctionQuery;
-  FmModelMemberBase   * mySelectedRoadFunc;
+  FFuaQueryBase*        myRoadFunctionQuery;
+  FmModelMemberBase*    mySelectedRoadFunc;
   double                myRoadZShift;
   double                myRoadXOffset;
   double                myRoadZRotation;
   FFaDynCB0             myBrowseRoadFileCB;
-  FFuaQueryBase       * myRoadDataFileRefQuery;
-  FmModelMemberBase   * mySelectedRoadDataFileRef;
+  FFuaQueryBase*        myRoadDataFileRefQuery;
+  FmModelMemberBase*    mySelectedRoadDataFileRef;
   std::string           myRoadDataFileName;
 
   // Material properties

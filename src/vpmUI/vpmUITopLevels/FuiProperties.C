@@ -527,6 +527,8 @@ void FuiProperties::initWidgets()
   myTriadTabs->setTabSelectedCB(FFaDynCB1M(FuiProperties,this,onTriadTabSelected,int));
   myTriadTabs->popDown();
 
+  myTriadSummary->my3DofButton->setToggleCB(FFaDynCB1M(FuiProperties,this,onBoolChanged,bool));
+
   myTriadSummary->mySysDirMenu->setOptionSelectedCB(FFaDynCB1M(FuiProperties,this,onIntChanged,int));
   myTriadSummary->myConnectorMenu->setOptionSelectedCB(FFaDynCB1M(FuiProperties,this,onIntChanged,int));
 
@@ -3407,7 +3409,19 @@ void FuiProperties::setUIValues(const FFuaUIValues* values)
   {
     this->buildDynamicWidgets(values);
 
-    myTriadSummary->myFENodeField->myField->setValue(pv->myFENodeIdx);
+    if (pv->myFENodeIdx >= 0)
+    {
+      bool use3DOF = pv->myTriadDofs == -3;
+      myTriadSummary->myFENodeField->setValue(std::to_string(pv->myFENodeIdx));
+      myTriadSummary->my3DofButton->setSensitivity(use3DOF || pv->myTriadDofs == 6);
+      myTriadSummary->my3DofButton->setValue(use3DOF);
+    }
+    else
+    {
+      myTriadSummary->myFENodeField->setValue("N/A");
+      myTriadSummary->my3DofButton->setValue(false);
+      myTriadSummary->my3DofButton->setSensitivity(false);
+    }
     myTriadSummary->myMassField->setValue(pv->myMass[0]);
     myTriadSummary->myIxField->setValue(pv->myMass[1]);
     myTriadSummary->myIyField->setValue(pv->myMass[2]);
@@ -3931,6 +3945,11 @@ void FuiProperties::getUIValues(FFuaUIValues* values)
   if (IAmShowingTriadData)
     {
       pv->selectedTab = mySelectedTabIndex;
+
+      if (myTriadSummary->my3DofButton->getSensitivity())
+        pv->myTriadDofs = myTriadSummary->my3DofButton->getValue() ? -3 : 6;
+      else
+        pv->myTriadDofs = 0;
 
       pv->myMass[0] = myTriadSummary->myMassField->getValue();
       pv->myMass[1] = myTriadSummary->myIxField->getValue();

@@ -13,6 +13,7 @@
 #include "FFuLib/FFuLabel.H"
 #include "FFuLib/FFuLabelFrame.H"
 #include "FFuLib/FFuLabelField.H"
+#include "FFuLib/FFuToggleButton.H"
 #include "FFuLib/FFuPushButton.H"
 #include "FFuLib/FFuIOField.H"
 #include "FFuLib/FFuOptionMenu.H"
@@ -25,6 +26,7 @@ void FuiTriadSummary::initWidgets()
   myFENodeField->setSensitivity(false);
   myFENodeField->toFront();
 
+  my3DofButton->setLabel("Use translational DOFs only");
   mySetAllFreeButton->setLabel("Set All Free");
   mySetAllFixedButton->setLabel("Set All Fixed");
 
@@ -100,6 +102,8 @@ void FuiTriadSummary::placeWidgets(int width, int height)
   myTriadLabel->setEdgeGeometry(v1,v4,h9,h10);
 
   h4 += 2*vBorder;
+  my3DofButton->setEdgeGeometry(v1,v4,h4,h4+fieldHeight);
+  h4 += 3*vBorder + fieldHeight;
   mySetAllFreeButton->setEdgeGeometry(v1,v4,h4,h4+fieldHeight);
   h4 += 2*vBorder + fieldHeight;
   mySetAllFixedButton->setEdgeGeometry(v1,v4,h4,h4+fieldHeight);

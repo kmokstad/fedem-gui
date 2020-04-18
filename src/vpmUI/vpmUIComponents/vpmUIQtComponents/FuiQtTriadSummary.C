@@ -9,6 +9,7 @@
 #include "FFuLib/FFuQtComponents/FFuQtLabel.H"
 #include "FFuLib/FFuQtComponents/FFuQtLabelFrame.H"
 #include "FFuLib/FFuQtComponents/FFuQtLabelField.H"
+#include "FFuLib/FFuQtComponents/FFuQtToggleButton.H"
 #include "FFuLib/FFuQtComponents/FFuQtPushButton.H"
 #include "FFuLib/FFuQtComponents/FFuQtOptionMenu.H"
 #include "vpmUI/vpmUIComponents/vpmUIQtComponents/FuiQtTriadSummary.H"
@@ -20,6 +21,7 @@ FuiQtTriadSummary::FuiQtTriadSummary(QWidget* parent,
   : FFuQtMultUIComponent(parent,xpos,ypos,width,height,name)
 {
   myFENodeField = new FFuQtLabelField(this);
+  my3DofButton = new FFuQtToggleButton(this);
   mySetAllFreeButton = new FFuQtPushButton(this);
   mySetAllFixedButton = new FFuQtPushButton(this);
 

@@ -12,6 +12,7 @@
 
 class FFuLabelFrame;
 class FFuLabelField;
+class FFuToggleButton;
 class FFuPushButton;
 class FFuOptionMenu;
 class FuiTriadDOFValues;
@@ -25,9 +26,10 @@ public:
 
   void setSummary(int dof, const FuiTriadDOFValues& tval);
 
-  FFuLabelField* myFENodeField;
-  FFuPushButton* mySetAllFreeButton;
-  FFuPushButton* mySetAllFixedButton;
+  FFuLabelField*   myFENodeField;
+  FFuToggleButton* my3DofButton;
+  FFuPushButton*   mySetAllFreeButton;
+  FFuPushButton*   mySetAllFixedButton;
 
   FFuLabelFrame* myMassFrame;
   FFuLabelField* myMassField;
