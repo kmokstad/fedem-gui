@@ -61,7 +61,8 @@ public:
                              bool saveRes = true, double atTime = -1.0);
 
   static bool vpmModelExport(const std::string& name,
-                             FmAnalysis* analysis = NULL, const char* model = NULL);
+                             FmAnalysis* analysis = NULL, const char* model = NULL,
+                             bool withParts = true);
 
   static void openCmdLineFile();
   static void vpmModelNew();

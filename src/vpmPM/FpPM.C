@@ -1816,7 +1816,9 @@ bool FpPM::vpmModelSaveAs(const std::string& name, bool saveReducedParts,
 }
 
 
-bool FpPM::vpmModelExport(const std::string& name, FmAnalysis* analysis, const char* model)
+bool FpPM::vpmModelExport(const std::string& name,
+                          FmAnalysis* analysis, const char* model,
+                          bool withParts)
 {
   FmMechanism* mech = FmDB::getMechanismObject();
   std::string oldRDBPath = mech->getAbsModelRDBPath();
@@ -1853,7 +1855,8 @@ bool FpPM::vpmModelExport(const std::string& name, FmAnalysis* analysis, const c
   }
 
   std::vector<FmPart*> allParts;
-  FmDB::getAllParts(allParts);
+  if (withParts)
+    FmDB::getAllParts(allParts);
 
   // Find set of FE parts with valid reduction data
   Strings oldPartDB;

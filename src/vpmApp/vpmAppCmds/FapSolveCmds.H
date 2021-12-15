@@ -59,6 +59,7 @@ private:
 #endif
 
   static void checkRunningCloudJob();
+  static bool cleanCloudApp();
 
 public:
   static bool haveCloud();
@@ -67,7 +68,6 @@ public:
 
 private:
   static std::string ourCloudJobId;
-  static std::string ourCloudAppId;
   static FFuaTimer*  ourCloudJobTimer;
   static char        haveCloudAccess;
 };

@@ -52,7 +52,10 @@
 #include "vpmDB/FmStrainRosette.H"
 #include "vpmDB/FmSimulationEvent.H"
 #include "vpmDB/FmSolverInput.H"
+#include "vpmDB/FmSolverParser.H"
 
+#include <ctime>
+#include <cctype>
 #include <cstdio>
 #if defined(win32) || defined(win64)
 #include <direct.h>
@@ -64,12 +67,7 @@
 #include <unistd.h>
 #endif
 
-#if FT_HAS_SAP > 1
-#include <chrono>
-#endif
-
 std::string FapSolveCmds::ourCloudJobId;
-std::string FapSolveCmds::ourCloudAppId;
 FFuaTimer* FapSolveCmds::ourCloudJobTimer = NULL;
 char FapSolveCmds::haveCloudAccess = 0;
 
@@ -636,6 +634,9 @@ void FapSolveCmds::reduceAllParts()
   FmDB::getFEParts(allParts,true);
   if (allParts.empty()) return;
 
+  if (!FapSolveCmds::cleanCloudApp())
+    return; // User didn't want to delete existing cloud app
+
   for (FmPart* part : allParts)
     FapSolutionProcessManager::instance()->pushSolverProcess(new FapLinkReducer(part));
 
@@ -845,7 +846,13 @@ void FapSolveCmds::reducePart()
   FuiModes::cancel();
 
   for (FmPart* part : parts)
-    FapSolutionProcessManager::instance()->pushSolverProcess(new FapLinkReducer(part));
+    if (part->isFEPart())
+    {
+      if (!FapSolveCmds::cleanCloudApp())
+        return; // User didn't want to delete existing cloud app
+
+      FapSolutionProcessManager::instance()->pushSolverProcess(new FapLinkReducer(part));
+    }
 
   FapSolutionProcessManager::instance()->run();
 }
@@ -1068,7 +1075,7 @@ static std::string runDtsCommand(const char* command, const std::string& args)
 
 //------------------------------------------------------------------------------
 
-static bool exportSimulationApp(const char* appname)
+static bool exportSimulationApp(const char* appname, bool newApp = true)
 {
   FFaMsg::pushStatus("Export app " + std::string(appname));
   FmMechanism* mech = FmDB::getMechanismObject();
@@ -1076,27 +1083,29 @@ static bool exportSimulationApp(const char* appname)
   // Copy template app-files
   std::string templPath = FpPM::getFullFedemPath("Templates/cloudsim");
   std::string appPath = FFaFilePath::appendFileNameToPath(mech->getAbsModelFilePath(), appname);
-  bool ok = FpFileSys::verifyDirectory(appPath, true);
-  ok &= FpFileSys::copyFile("app.json", templPath, appPath);
-  ok &= FpFileSys::copyFile("resource-config.yml", templPath, appPath);
-
+  bool ok = FpFileSys::verifyDirectory(appPath, newApp);
+  if (newApp)
+  {
+    ok &= FpFileSys::copyFile("app.json", templPath, appPath);
+    ok &= FpFileSys::copyFile("resource-config.yml", templPath, appPath);
+  }
   std::string libPath = FFaFilePath::appendToPath(appPath, "lib");
-  ok &= FpFileSys::verifyDirectory(libPath, true);
-  ok &= FpFileSys::copyFile("driver.py", templPath, libPath);
+  ok &= FpFileSys::verifyDirectory(libPath, newApp);
+  if (newApp)
+    ok &= FpFileSys::copyFile("driver.py", templPath, libPath);
 
   // Save model file with dependencies to app folder
-  std::string currPath = mech->getModelFileName();
   std::string newFMMPath = libPath;
-  FFaFilePath::appendToPath(newFMMPath, FFaFilePath::getFileName(currPath));
-  ok &= FpPM::vpmModelExport(newFMMPath);
+  FFaFilePath::appendToPath(newFMMPath, mech->getModelName(true));
+  ok &= FpPM::vpmModelExport(newFMMPath, NULL, NULL, newApp);
   FFaMsg::popStatus();
   return ok;
 }
 
 
-static bool pushAppToCloud(const char* appname)
+static bool pushAppToCloud(const std::string& appname)
 {
-  FFaMsg::pushStatus("Pushing app "+ std::string(appname) +" to cloud");
+  FFaMsg::pushStatus("Pushing app "+ appname +" to cloud");
   std::string msg = runDtsCommand("push",appname);
   FFaMsg::popStatus();
   if (msg.find("OK") > msg.size())
@@ -1107,6 +1116,25 @@ static bool pushAppToCloud(const char* appname)
 
   std::cout << msg <<"App "<< appname
             <<" successfully pushed to the cloud.\n"<< std::endl;
+  return true;
+}
+
+
+static bool pushUpdatedModelToCloud(const std::string& appname,
+                                    const std::string& fmmName)
+{
+  std::string fmmFile = FFaFilePath::appendFileNameToPath(" lib",fmmName);
+  FFaMsg::pushStatus("Pushing model file to cloud app "+ appname);
+  std::string msg = runDtsCommand("push-input", appname + fmmFile);
+  FFaMsg::popStatus();
+  if (msg.find("OK") > msg.size())
+  {
+    FFaMsg::list(msg+"\n",true);
+    return false;
+  }
+
+  std::cout << msg <<"App "<< appname
+            <<" successfully updated in the cloud.\n"<< std::endl;
   return true;
 }
 
@@ -1163,7 +1191,7 @@ static int startAppWhenReady(const char* appname, std::string& jobId)
 }
 
 
-static int checkCloudJob(const char* appname, const std::string& jobId)
+static int checkJob(const char* appname, const std::string& jobId)
 {
   std::string msg = runDtsCommand("job",appname+std::string(" --job ")+jobId);
   if (msg.find("Job "+jobId+" not exist for app") < msg.size())
@@ -1258,11 +1286,19 @@ void FapSolveCmds::solveInCloud()
 #if FT_HAS_SAP > 1
   FuiModes::cancel();
 
+  // Check model consistency
+  bool ok = FmSolverParser::preSimuleCheck();
+  if (!ok)
+  {
+    FFaMsg::dialog("The current model is not solvable.\n"
+                   "Check Output List for details.",FFaMsg::ERROR);
+    return;
+  }
+
   // Check that all FE parts have been reduced
   FmMechanism* mech = FmDB::getMechanismObject();
   std::vector<FmPart*> allParts;
   FmDB::getFEParts(allParts);
-  bool ok = true;
   bool needMass = FmDB::getActiveAnalysis()->needMassMatrix();
   for (FmPart* part : allParts)
     if (part->setValidBaseFTLFile().empty())
@@ -1285,12 +1321,29 @@ void FapSolveCmds::solveInCloud()
     return;
   }
 
-  // Create unique app-id
-  long long currTimeSeconds = static_cast<long long>(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count());
-  ourCloudAppId = FFaLowerCaseString(FFaFilePath::getBaseName(mech->getModelFileName(), true) + std::to_string(currTimeSeconds));
+  // Check if we need a new cloud app for this model
+  bool newApp = true;
+  std::string appId = analy->cloudAppId.getValue();
+  if (!appId.empty())
+  {
+    std::string msg = runDtsCommand("app",appId.c_str());
+    newApp = msg.find("FAILED") < msg.size();
+  }
 
-  // Create simulation app-folder with content
-  ok = exportSimulationApp(ourCloudAppId.c_str());
+  if (newApp)
+  {
+    // Create unique app-id for this model
+    appId = FFaLowerCaseString(mech->getModelName()) + std::to_string(time(NULL));
+    // Remove illegal characters (only alphanumeric chars are allowed)
+    for (std::string::iterator c = appId.begin(); c != appId.end();)
+      if (isalnum(*c))
+        ++c;
+      else
+        c = appId.erase(c);
+  }
+
+  // Create app folder with content
+  ok = exportSimulationApp(appId.c_str(),newApp);
   if (!ok)
   {
     FFaMsg::dialog("Failed to export simulation app.\n"
@@ -1299,10 +1352,10 @@ void FapSolveCmds::solveInCloud()
     return;
   }
 
-  // Change working directory to App folder
+  // Change working directory to app folder
   char* oldwd = getcwd(NULL,128);
   std::string appPath = mech->getAbsModelFilePath();
-  if (chdir(FFaFilePath::appendToPath(appPath, ourCloudAppId).c_str()))
+  if (chdir(FFaFilePath::appendToPath(appPath,appId).c_str()))
   {
     perror(appPath.c_str());
     free(oldwd);
@@ -1312,7 +1365,7 @@ void FapSolveCmds::solveInCloud()
 
   // Launch the dynamics solver in the cloud
   Fui::noUserInputPlease();
-  ok = pushAppToCloud(ourCloudAppId.c_str());
+  ok = newApp ? pushAppToCloud(appId) : pushUpdatedModelToCloud(appId,mech->getModelName(true));
   Fui::okToGetUserInput();
 
   if (oldwd)
@@ -1324,8 +1377,7 @@ void FapSolveCmds::solveInCloud()
   }
 
   if (ok)
-    ListUI <<" ==> Successfully pushed simulation app "<< ourCloudAppId
-           <<" to the cloud.\n";
+    ListUI <<" ==> Successfully pushed simulation app "<< appId <<" to the cloud.\n";
   else
   {
     FFaMsg::dialog("Failed to push cloud simulation app.\n"
@@ -1333,6 +1385,7 @@ void FapSolveCmds::solveInCloud()
     return;
   }
 
+  analy->cloudAppId.setValue(appId);
   if (!ourCloudJobTimer)
     ourCloudJobTimer = FFuaTimer::create(FFaDynCB0S(checkRunningCloudJob));
 
@@ -1347,14 +1400,14 @@ void FapSolveCmds::solveInCloud()
 void FapSolveCmds::checkRunningCloudJob()
 {
 #if FT_HAS_SAP > 1
-  const char* appName = ourCloudAppId.c_str();
+  const char* appName = FmDB::getActiveAnalysis()->cloudAppId.getValue().c_str();
 
   // Check job status in the cloud
   int status = 0;
   if (ourCloudJobId.empty())
     status = startAppWhenReady(appName,ourCloudJobId);
   else
-    status = checkCloudJob(appName,ourCloudJobId);
+    status = checkJob(appName,ourCloudJobId);
 
   if (status == 0 || status == 1) return; // Still, or not yet running
 
@@ -1370,13 +1423,41 @@ void FapSolveCmds::checkRunningCloudJob()
   if (downloadCloud(appName,ourCloudJobId))
     FapSolveCmds::refreshRDB();
 
+  ourCloudJobId.clear();
+  if (FFaMsg::dialog("Cloud simulation finished.\n"
+                     "Do you want to retain the simulation app in the cloud?",
+                     FFaMsg::YES_NO)) return;
+
   // Clean up the app
   runDtsCommand("delete",appName+std::string(" -f"));
+  ListUI <<" ==> Deleted cloud simulation app "<< appName <<"\n";
+  std::string path = FmDB::getMechanismObject()->getAbsModelFilePath();
+  if (FpFileSys::deleteDirectory(FFaFilePath::appendToPath(path,appName),true,true))
+    ListUI <<"  -> Removed cloud app folder "<< path <<"\n";
+  FmDB::getActiveAnalysis()->cloudAppId.setValue("");
+#endif
+}
 
-  FmMechanism* mech = FmDB::getMechanismObject();
-  std::string path = mech->getAbsModelFilePath();
-  FpFileSys::removeDir(FFaFilePath::appendToPath(path,appName));
-  ourCloudAppId.clear();
-  ourCloudJobId.clear();
+//------------------------------------------------------------------------------
+
+bool FapSolveCmds::cleanCloudApp()
+{
+#if FT_HAS_SAP > 1
+  std::string appId = FmDB::getActiveAnalysis()->cloudAppId.getValue();
+  if (appId.empty()) return true;
+
+  if (runDtsCommand("app",appId.c_str()).find("OK") != std::string::npos)
+  {
+    if (!FFaMsg::dialog("This model is already associated with "
+                        "the cload simulation app \"" + appId + "\".\n"
+                        "Do you want to delete it?",
+                        FFaMsg::YES_NO)) return false;
+
+    runDtsCommand("delete", appId + " -f");
+    ListUI <<" ==> Deleted cloud simulation app "<< appId <<"\n";
+  }
+
+  FmDB::getActiveAnalysis()->cloudAppId.setValue("");
+  return true;
 #endif
 }
