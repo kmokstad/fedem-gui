@@ -24,9 +24,8 @@
 #ifdef FT_REDIRECT_COUT
 #include <fstream> // For std::cout redirection
 #endif
-
 #include <cstring>
-#if defined(win32) || defined(win64)
+#ifdef _MSC_VER
 #define strcasecmp _stricmp
 #define NOGDI
 #define WIN32_LEAN_AND_MEAN
@@ -63,9 +62,13 @@ int doMainLoop ()
 
 int main (int argc, char** argv)
 {
-#if defined(_MSV_VER) && _MSC_VER < 1900
+#ifdef _MSC_VER
+  // Disable searching for DLL's in current working directory (SEC-243)
+  SetDllDirectory("");
+#if _MSC_VER < 1900
   // Use two digit exponent in [s]printf(..)
   _set_output_format(_TWO_DIGIT_EXPONENT);
+#endif
 #endif
 
   const char* ext = argc == 2 ? strrchr(argv[1],'.') : NULL;
