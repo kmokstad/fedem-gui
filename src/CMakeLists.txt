@@ -91,6 +91,14 @@ if ( WIN )
     string ( APPEND LINKER_FLAGS " /subsystem:windows /entry:mainCRTStartup" )
   endif ( USE_COMAPI )
 
+  # Delay loading DLLs
+  set ( DLL_LIST )
+  #set ( DLL_LIST Qt3Support4 QtCore4 QtGui4 )
+  #list ( APPEND DLL_LIST QtNetwork4 QtOpenGL4 QtSql4 QtXml4 )
+  if ( Coin_library )
+    list ( APPEND DLL_LIST Coin4 SmallChange1 SoQt1 simage1 )
+  endif ( Coin_library )
+
 # Resource file for the executable
   set ( APP_ICON "vpmUI/Icons/win32AppIcon/fedem_app_icon.rc" )
 endif ( WIN )
@@ -129,6 +137,15 @@ endif ( USE_FORTRAN AND USE_CHSHAPE )
 
 add_subdirectory ( ${MDB_DIR}/vpmDB "${CMAKE_CURRENT_BINARY_DIR}/vpmDB" )
 
+if ( WIN )
+  if ( ZLIB_LIBRARY )
+    list ( APPEND DLL_LIST zlib )
+  endif ( ZLIB_LIBRARY )
+  foreach ( DLL_NAME ${DLL_LIST} )
+    string ( APPEND CMAKE_EXE_LINKER_FLAGS " /DELAYLOAD:${DLL_NAME}.dll" )
+  endforeach ( DLL_NAME ${DLL_LIST} )
+endif ( WIN )
+
 #
 # Collect all internal and external libraries
 #
@@ -137,6 +154,9 @@ if ( Coin_library )
   list ( APPEND DEPENDENCY_LIST vpmDisplay )
 endif ( Coin_library )
 list ( APPEND DEPENDENCY_LIST vpmDB FiUserElmPlugin FFaOperation )
+if ( WIN )
+  list ( APPEND DEPENDENCY_LIST "delayimp.lib" )
+endif ( WIN )
 
 message ( STATUS "Building executable Fedem" )
 string ( APPEND CMAKE_CXX_FLAGS " -DFT_USE_CONNECTORS" )
