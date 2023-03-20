@@ -249,9 +249,10 @@ bool FapToolsCmds::getAddonExe(int, char*, char*)
   // Get module path
   std::string modulePath = FpPM::getFullFedemPath("addons");
   std::string addOnFilter = modulePath + "\\*.exe";
+  std::wstring wFilter(addOnFilter.begin(),addOnFilter.end());
   // Find files
   WIN32_FIND_DATA ffd;
-  HANDLE hFind = ::FindFirstFile(addOnFilter.c_str(), &ffd);
+  HANDLE hFind = ::FindFirstFile(wFilter.c_str(), &ffd);
   if (hFind == INVALID_HANDLE_VALUE)
     return false;
   int i = 0; do
@@ -259,14 +260,17 @@ bool FapToolsCmds::getAddonExe(int, char*, char*)
     if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
       continue;
     if (index == i) {
+      std::string fileName(wcslen(ffd.cFileName),0);
+      WCHAR* p = ffd.cFileName;
+      for (char& c : fileName) c = char(*(p++)); // cast to 16-bit char
       // ExeName
       if (pszExeName)
-        strtok(strcpy(pszExeName,ffd.cFileName),".");
+        strtok(strcpy(pszExeName,fileName.c_str()),".");
       // ExePath
       if (pszExePath) {
         strcpy(pszExePath,modulePath.c_str());
         strcat(pszExePath,"\\");
-        strcat(pszExePath,ffd.cFileName);
+        strcat(pszExePath, fileName.c_str());
       }
       return true;
     }
@@ -284,14 +288,14 @@ void FapToolsCmds::addonLaunch(int index)
   char szExePath[MAX_PATH];
   if (getAddonExe(index,szExePath))
   {
-    std::string cpid = " " + std::to_string(GetCurrentProcessId());
+    std::wstring wExePath(szExePath, szExePath + strlen(szExePath));
+    wExePath.append(L" " + std::to_wstring(GetCurrentProcessId()));
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
     ZeroMemory(&si, sizeof(si));
     ZeroMemory(&pi, sizeof(pi));
     si.cb = sizeof(si);
-    CreateProcess(NULL, (char*)(szExePath + cpid).c_str(),
-                  NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+    CreateProcess(NULL, (wchar_t*)wExePath.c_str(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
   }
 #else
   std::cerr <<"  ** FapToolsCmds::addonLaunch("<< index <<"): No Linux support"<< std::endl;
@@ -446,8 +450,8 @@ static bool FmRegCreateKey(const std::string& key, const std::string& val, bool*
     return false; // don't proceed
 
   // Fix slashes
-  std::string strKey(key);
-  for (char& c : strKey)
+  std::wstring strKey(key.begin(),key.end());
+  for (wchar_t& c : strKey)
     if (c == '/') c = '\\';
 
   // Create key
@@ -465,7 +469,7 @@ static bool FmRegCreateKey(const std::string& key, const std::string& val, bool*
 
   // Set default value
   err = ::RegSetValueEx(regKey,
-                        "",
+                        L"",
                         NULL,
                         REG_EXPAND_SZ,
                         (BYTE*)val.c_str(),
@@ -581,17 +585,17 @@ bool FapToolsCmds::checkFileAssociations()
   // Get version
   std::string key("FMM-file\\internal\\");
   key += FedemAdmin::getVersion();
-
+  std::wstring wkey(key.begin(), key.end());
   // Open registry key
   HKEY hk;
-  LONG err = ::RegOpenKeyEx(HKEY_CLASSES_ROOT,key.c_str(),
+  LONG err = ::RegOpenKeyEx(HKEY_CLASSES_ROOT,wkey.c_str(),
                             0,KEY_QUERY_VALUE,&hk);
   if (err != ERROR_SUCCESS)
     return false;
 
   // Get registry value
   DWORD cbData = 0;
-  err = ::RegQueryValueEx(hk,"",NULL,NULL,NULL,&cbData);
+  err = ::RegQueryValueEx(hk,L"",NULL,NULL,NULL,&cbData);
   ::RegCloseKey(hk);
   return (err == ERROR_SUCCESS && cbData == 11);
 
