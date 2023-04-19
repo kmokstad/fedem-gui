@@ -3337,6 +3337,7 @@ void FuiProperties::setUIValues(const FFuaUIValues* values)
       myJointSummary->setSummary(jv,pv->myJointVals[jv]);
     }
 
+    myJointSummary->mySummaryTable->stretchColWidth(-1,true);
     myJointResults->setValues(pv->myResToggles);
   }
 
@@ -3441,6 +3442,7 @@ void FuiProperties::setUIValues(const FFuaUIValues* values)
       myTriadSummary->setSummary(i,pv->myTriadVals[i]);
     }
 
+    myJointSummary->mySummaryTable->stretchColWidth(-1,true);
     myTriadResults->setValues(pv->myResToggles);
   }
 
