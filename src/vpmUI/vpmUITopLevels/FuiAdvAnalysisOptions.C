@@ -539,7 +539,7 @@ void FuiAdvAnalysisOptions::placeWidgets(int width, int height)
   this->btnRunCloud->setEdgeGeometry(250,322,glsep,height-border);
   this->btnHelp->setEdgeGeometry(330,glbr,glsep,height-border);
 
-  int glNotes = 380;
+  int glNotes = glsep-glbt-35-3*border;
   this->labNotesImage->setEdgeGeometry(15,  31, glNotes, glNotes+16);
   this->labNotesLabel->setEdgeGeometry(35, 305, glNotes, glNotes+16);
   glNotes += 19;
