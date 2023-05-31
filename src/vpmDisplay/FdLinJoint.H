@@ -21,9 +21,9 @@ public:
   FdLinJoint(FmMMJointBase* pt);
 
   virtual bool updateFdTopology(bool updateChildrenDisplay = true);
-  virtual bool updateFdDetails();
+  virtual bool updateFdDetails() { this->show(true); return true; }
   virtual bool updateFdApperance();
-  virtual void hide();
+  virtual void hide() { this->show(false); }
 
   virtual void smartMove(const FaVec3& firstPoint, const FaVec3& secondPoint,
 			 const FaDOF& dof);
@@ -40,6 +40,8 @@ protected:
 
   virtual void showHighlight();
   virtual void hideHighlight();
+
+  void show(bool doShow);
 
   int isNotBetween(const FaVec3& p, const FaVec3& p1,
 		   const FaVec3& p2, bool& isClosestToFirst);

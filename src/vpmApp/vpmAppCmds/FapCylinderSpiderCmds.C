@@ -50,8 +50,10 @@ void FapCylinderSpiderCmds::init()
   cmdItem->setSmallIcon(spider_geom_rbe2_xpm);
   cmdItem->setText("By cylinder surface");
   cmdItem->setToolTip("Create a rigid connection element by defining a cylinder.\n"
-                      "The master node is placed in the center.\n"
-                      "Nodes on the cylinder surface are selected as slaves.");
+                      "The independent reference node is placed in the center.\n"
+                      "Nodes on the cylinder surface become dependent nodes,\n"
+                      "whose DOFs are coupled to the independent node via\n"
+                      "linear multi-point constraints.");
   cmdItem->setActivatedCB(FFaDynCB0S(FapCylinderSpiderCmds::createRBE2Spider));
   cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCylinderSpiderCmds::getSensitivity,bool&));
 
@@ -59,8 +61,9 @@ void FapCylinderSpiderCmds::init()
   cmdItem->setSmallIcon(spider_geom_rbe3_xpm);
   cmdItem->setText("By cylinder surface");
   cmdItem->setToolTip("Create a flexible connection element by defining a cylinder.\n"
-                      "The reference node is placed in the center.\n"
-                      "Nodes on the cylinder surface are selected as masters.");
+                      "The dependent reference node is placed in the center, and its\n"
+                      "DOFs are coupled to all independent nodes on the cylinder surface\n"
+                      "via linear multi-point constraints.");
   cmdItem->setActivatedCB(FFaDynCB0S(FapCylinderSpiderCmds::createRBE3Spider));
   cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCylinderSpiderCmds::getSensitivity,bool&));
 }
@@ -190,7 +193,7 @@ void FapCylinderSpiderCmds::setState(int newState)
       break;
     case END_NODE_ACCEPTED:
     case MASTER_PLANE_SELECTED:
-      Fui::tip("Press Done to confirm master node plane, or pick again to select a different node.");
+      Fui::tip("Press Done to confirm independent node plane, or pick again to select a different node.");
       break;
     }
 }

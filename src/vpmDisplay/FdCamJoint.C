@@ -56,9 +56,9 @@ FdCamJoint::FdCamJoint(FmCamJoint* pt) : FdObject()
   FdBackPointer* bp_pointer = SO_GET_PART(itsKit,"backPt",FdBackPointer);
   bp_pointer->setPointer(this);
 
-  // Set up back pointer connections in the kit.
-  // The master connection has to be set up for each master.
-  // This is done in FdCamJoint::updateFdTopology()
+  // Set up back pointer connection in the kit.
+  // The connection for each glider triad
+  // is done in FdCamJoint::updateFdTopology().
   itsKit->setPart("slave.backPt",bp_pointer);
 }
 
@@ -83,12 +83,12 @@ bool FdCamJoint::updateFdTopology(bool updateChildrenDisplay)
 
   FmCamJoint* fmJoint = (FmCamJoint*)itsFmOwner;
 
-  // Set up slave part of the joint:
+  // Set up dependent part of the joint:
 
   FmTriad* triad = fmJoint->getSlaveTriad();
-  if (!triad) // Joints should always have a slave triad
+  if (!triad) // Joints should always have a dependent triad
   {
-    std::cerr <<"No slave triad in "<< itsFmOwner->getIdString(true) << std::endl;
+    std::cerr <<"No dependent triad in "<< itsFmOwner->getIdString(true) << std::endl;
     return false;
   }
 
@@ -103,17 +103,17 @@ bool FdCamJoint::updateFdTopology(bool updateChildrenDisplay)
   itsKit->setPart("slave.appearance",appearanceKit);
   itsKit->setPart("slave.backPt",backPt);
 
-  // Set up master part of the joint:
+  // Set up independent part of the joint:
 
   SoNodeKitListPart* masterList = SO_GET_PART(itsKit,"masterList",SoNodeKitListPart);
   for (int c = masterList->getNumChildren()-1; c >= 0; c--)
     masterList->removeChild(c);
 
-  std::vector<FmTriad*> masters;
-  fmJoint->getMasterTriads(masters);
-  for (FmTriad* master : masters)
+  std::vector<FmTriad*> triads;
+  fmJoint->getMasterTriads(triads);
+  for (FmTriad* triad : triads)
   {
-    fdTriad       = master->getFdPointer();
+    fdTriad       = triad->getFdPointer();
     transLink     = SO_GET_PART(fdTriad->getKit(),"firstTrans",SoTransform);
     transLocal    = SO_GET_PART(fdTriad->getKit(),"secondTrans",SoTransform);
     appearanceKit = SO_GET_PART(fdTriad->getKit(),"appearance",FdAppearanceKit);
@@ -127,7 +127,6 @@ bool FdCamJoint::updateFdTopology(bool updateChildrenDisplay)
     transformKit->setPart("appearance",appearanceKit);
     transformKit->setPart("backPt",backPt);
 
-    // Insert the transformKit in the master list:
     masterList->addChild(transformKit);
   }
 
@@ -215,43 +214,25 @@ bool FdCamJoint::updateFdApperance()
   return true;
 }
 
-void FdCamJoint::hide()
+void FdCamJoint::show(bool doShow)
 {
-  // Set the slave symbol
+  itsKit->setPart("slave.symbol", doShow ? FdSymbolDefs::getSymbol(FdSymbolDefs::CAMJOINT_SLAVE) : NULL);
 
-  itsKit->setPart("slave.symbol", NULL);
-
-  // Set the master symbols
-
-  SoNodeKitListPart* list = SO_GET_PART(itsKit, "masterList", SoNodeKitListPart);
-  int nNodes = list->getNumChildren();
-  for (int i = 0; i < nNodes; i++)
+  int nTriads = SO_GET_PART(itsKit, "masterList", SoNodeKitListPart)->getNumChildren();
+  for (int i = 0; i < nTriads; i++)
   {
     FFaNumStr name("masterList[%d].symbol", i);
-    itsKit->setPart(name.c_str(), NULL);
+    itsKit->setPart(name.c_str(), doShow ? FdSymbolDefs::getSymbol(FdSymbolDefs::CAMJOINT_MASTER) : NULL);
   }
+}
+
+void FdCamJoint::hide()
+{
+  this->show(false);
 
   SoNodeKitListPart* curveList = SO_GET_PART(itsKit, "curveList", SoNodeKitListPart);
   for (int c = curveList->getNumChildren() - 1; c >= 0; c--)
     curveList->removeChild(c);
-}
-
-bool FdCamJoint::updateFdDetails()
-{
-  // Set the slave symbol
-
-  itsKit->setPart("slave.symbol", FdSymbolDefs::getSymbol(FdSymbolDefs::CAMJOINT_SLAVE));
-
-  // Set the master symbols
-
-  SoNodeKitListPart* list = SO_GET_PART(itsKit,"masterList",SoNodeKitListPart);
-  int nNodes = list->getNumChildren();
-  for (int i = 0; i < nNodes; i++)
-  {
-    FFaNumStr name("masterList[%d].symbol",i);
-    itsKit->setPart(name.c_str(), FdSymbolDefs::getSymbol(FdSymbolDefs::CAMJOINT_MASTER));
-  }
-  return true;
 }
 
 
@@ -262,14 +243,10 @@ void FdCamJoint::showHighlight()
 #endif
   SoMaterial* hmat = FdSymbolDefs::getHighlightMaterial();
 
-  // Highlight Slave :
-
   itsKit->setPart("slave.appearance.material",hmat);
 #ifdef USE_SMALLCHANGE
   itsKit->setPart("slave.appearance.depth",dbn);
 #endif
-
-  // Highlight Masters :
 
   SoNodeKitListPart* list = SO_GET_PART(itsKit,"masterList",SoNodeKitListPart);
   int i, nNodes = list->getNumChildren();
@@ -281,8 +258,6 @@ void FdCamJoint::showHighlight()
     ((SoBaseKit*)node)->setPart("appearance.depth",dbn);
 #endif
   }
-
-  // Highlight Curves :
 
   list = SO_GET_PART(itsKit,"curveList",SoNodeKitListPart);
   nNodes = list->getNumChildren();
@@ -296,11 +271,11 @@ void FdCamJoint::hideHighlight()
   this->updateFdApperance();
   ((FmJointBase*)itsFmOwner)->getSlaveTriad()->getFdPointer()->updateFdApperance();
 
-  std::vector<FmTriad*> masters;
-  ((FmMMJointBase*)itsFmOwner)->getMasterTriads(masters);
+  std::vector<FmTriad*> triads;
+  ((FmMMJointBase*)itsFmOwner)->getMasterTriads(triads);
 
-  for (FmTriad* master : masters)
-    master->getFdPointer()->updateFdApperance();
+  for (FmTriad* triad : triads)
+    triad->getFdPointer()->updateFdApperance();
 }
 
 
@@ -349,9 +324,9 @@ void FdCamJoint::smartMove(const FaVec3& p1, const FaVec3& p2, const FaDOF& dof)
   bool addSticker = true;
   for (FmTriad* triad : triads)
   {
-    FdTriad* master = (FdTriad*)triad->getFdPointer();
-    masterTransform = SO_GET_PART(master->getKit(),"secondTrans",SoTransform);
-    masterAnimator = new FdPtPMoveAnimator(masterTransform, master, translation,rotation, centerPoint,firstPoint, addSticker);
+    FdTriad* fdTriad = (FdTriad*)triad->getFdPointer();
+    masterTransform = SO_GET_PART(fdTriad->getKit(),"secondTrans",SoTransform);
+    masterAnimator = new FdPtPMoveAnimator(masterTransform, fdTriad, translation,rotation, centerPoint,firstPoint, addSticker);
     masterAnimator->start();
     addSticker = false;
   }

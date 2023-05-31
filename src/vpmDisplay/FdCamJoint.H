@@ -23,7 +23,7 @@ public:
 
   virtual void hide();
   virtual bool updateFdTopology(bool updateChildrenDisplay = true);
-  virtual bool updateFdDetails();
+  virtual bool updateFdDetails() { this->show(true); return true; }
   virtual bool updateFdApperance();
 
   virtual void smartMove(const FaVec3& firstPoint, const FaVec3& secondPoint,
@@ -38,6 +38,8 @@ protected:
   virtual void hideHighlight();
 
 private:
+  void show(bool doShow);
+
   static void arcToNURBS(const FaVec3& p1, const FaVec3& p2, const FaVec3& p3,
 			 std::vector<double>& xi,
 			 std::vector<FaVec3>& P, std::vector<double>& w);

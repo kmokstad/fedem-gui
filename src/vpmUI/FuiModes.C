@@ -241,7 +241,7 @@ void FuiModes::done()
       case 1:
         FuiModes::setState(2);
         break;
-      case 2: // Pick slave
+      case 2: // Pick dependent triad
       case 3:
         FuiModes::setState(4);
         FuiModes::setState(0); // For continous creating
@@ -255,7 +255,7 @@ void FuiModes::done()
     case MAKECYLJOINTBETWEENTRIADS_MODE:
       // Three-pick create done
       switch (state) {
-      case 0: // Pick first master
+      case 0: // Pick first independent triad
         if (FuiModes::createPositionIsChangedByGUI)
           FuiModes::setState(3);
         else
@@ -264,7 +264,7 @@ void FuiModes::done()
       case 1: // Triad picked
         FuiModes::setState(3);
         break;
-      case 3: // Pick second master
+      case 3: // Pick second independent triad
         FuiModes::setState(4);
         break;
       case 4: // Triad picked
@@ -275,8 +275,8 @@ void FuiModes::done()
         FuiModes::setState(10);
         FuiModes::setState(0); // For continous creating
         break;
-      case 2: // Triad is already slave in another joint
-      case 5: // Triad is already slave
+      case 2: // Triad is already dependent in another joint
+      case 5: // Triad is already dependent
       case 8:
       case 9:
         break;
@@ -300,12 +300,12 @@ void FuiModes::done()
         FuiModes::setState(4);
         break;
       case 3: // Other object picked
-      case 4: // Pick slave
+      case 4: // Pick dependent triad
       case 5: // Triad picked
         FuiModes::setState(8);
         FuiModes::setState(0); // For continous creating
         break;
-      case 6: // Triad is slave in another joint
+      case 6: // Triad is dependent in another joint
       case 7: // No triad selected
       case 8: // Triad is attached to reference plane
         break;
@@ -628,16 +628,16 @@ void FuiModes::setTip()
       switch (FuiModes::state)
 	{
 	case 0:
-	  Fui::tip("Pick or write where to put the Master triad of Free Joint (Done when ready)");
+	  Fui::tip("Pick or write where to put the <i>independent</i> triad of Free Joint (Done when ready)");
 	  break;
 	case 1:
-	  Fui::tip("Pick again, or write to change where to put the Master triad of Free Joint (Done when ready)");
+	  Fui::tip("Pick again, or write to change where to put the independent triad of Free Joint (Done when ready)");
 	  break;
 	case 2:
-	  Fui::tip("Pick or write where to put the Slave triad of Free Joint (Done when ready)");
+	  Fui::tip("Pick or write where to put the <i>dependent</i> triad of Free Joint (Done when ready)");
 	  break;
 	case 3:
-	  Fui::tip("Pick again, or write to change where to put the Slave triad of Free Joint (Done when ready)");
+	  Fui::tip("Pick again, or write to change where to put the dependent triad of Free Joint (Done when ready)");
 	  break;
 	case 4:
 	  Fui::tip("Creating Free Joint ...");
@@ -649,7 +649,7 @@ void FuiModes::setTip()
       switch (FuiModes::state)
 	{
 	case 0:
-	  Fui::tip("Pick a Triad to use as Master in the Free Joint, or the Reference Plane to create a grounded Free Joint (Done when ready)");
+	  Fui::tip("Pick <i>independent</i> triad for the Free Joint, or the Reference Plane to create a grounded Free Joint (Done when ready)");
 	  break;
 	case 1:
 	  Fui::tip("Triad selected. Pick again to change (Done when ready)");
@@ -658,22 +658,22 @@ void FuiModes::setTip()
 	  Fui::tip("Reference Plane selected. Pick again to change (Done when ready)");
 	  break;
 	case 3:
-	  Fui::tip("No Triad selected. Pick again (Done when ready)");
+	  Fui::tip("No triad selected. Pick again (Done when ready)");
 	  break;
 	case 4:
-	  Fui::tip("Pick a Triad to use as Slave in the Free Joint (Done when ready)");
+	  Fui::tip("Pick <i>dependent</i> triad for the Free Joint (Done when ready)");
 	  break;
 	case 5:
 	  Fui::tip("Triad selected. Pick again to change (Done when ready)");
 	  break;
 	case 6:
-	  Fui::tip("Selected Triad is already a Slave in another Joint. Pick again (Done when ready)");
+	  Fui::tip("Selected triad is already dependent in another joint. Pick again (Done when ready)");
 	  break;
 	case 7:
-	  Fui::tip("No Triad selected. Pick again (Done when ready)");
+	  Fui::tip("No triad selected. Pick again (Done when ready)");
 	  break;
 	case 8:
-	  Fui::tip("Selected Triad is attached to ground and can therefore not be a Slave. Pick again (Done when ready)");
+	  Fui::tip("Selected triad is attached to ground and can therefore not be dependent. Pick again (Done when ready)");
 	  break;
 	case 9:
 	  Fui::tip("Creating Free Joint ...");
@@ -723,16 +723,16 @@ void FuiModes::setTip()
 	  break;
 	case 2:
 	case 5:
-	  Fui::tip("Selected Triad is already a Slave, and can therefore not be used as Master. Pick again (Done when ready)");
+	  Fui::tip("Selected triad is <i>dependent</i> in another joint, and can therefore not be used as glider start/end point. Pick again (Done when ready)");
 	  break;
 	case 6:
-	  Fui::tip("Pick the Slave triad of the Joint, or press Done to create a new Triad between the two Master triads.");
+	  Fui::tip("Pick the <i>dependent</i> triad of the joint, or press Done to create a new Triad along the glider.");
 	  break;
 	case 8:
-	  Fui::tip("Selected Triad is already a Slave in another Joint. Pick again (Done when ready)");
+	  Fui::tip("Selected triad is already dependent in another joint. Pick again (Done when ready)");
 	  break;
 	case 9:
-	  Fui::tip("Selected Triad is not along the line through the two Master triads. Pick again (Done when ready)");
+	  Fui::tip("Selected triad is not along the glider line. Pick again (Done when ready)");
 	  break;
 	case 10:
 	  if (mode == MAKECYLJOINTBETWEENTRIADS_MODE)
@@ -750,7 +750,7 @@ void FuiModes::setTip()
 	  Fui::tip("Pick or write the position for the follower Triad (Done when ready)");
 	  break;
 	case 1:
-	  Fui::tip("To change the position for the follower Triad, pick again or change the numbers in the odometre (Done when ready)");
+	  Fui::tip("To change the position for the follower, pick again or change the numbers in the odometre (Done when ready)");
 	  break;
 	case 2:
 	  Fui::tip("Pick or write a position, pick a Triad along the Cam curve, or pick an existing Cam curve (Done when ready)");
@@ -913,13 +913,13 @@ void FuiModes::setTip()
       switch (FuiModes::state)
 	{
 	case 0:
-	  Fui::tip("Pick where to add a Master to the Linear Joint");
+	  Fui::tip("Pick where to add an independent triad to the linear joint");
 	  break;
 	case 1:
-	  Fui::tip("Pick to change where to add the Master (Done when ready)");
+	  Fui::tip("Pick to change where to add the independent triad (Done when ready)");
 	  break;
 	case 2:
-	  Fui::tip("Trying to Add master ...");
+	  Fui::tip("Trying to add independent triad ...");
 	  break;
 	}
       break;
@@ -938,7 +938,7 @@ void FuiModes::setTip()
 	  Fui::tip("Pick first point to measure distance between");
 	  break;
 	case 1:
-	  Fui::tip("Pick second point to measure distance betwem");
+	  Fui::tip("Pick second point to measure distance between");
 	  break;
 	}
       break;

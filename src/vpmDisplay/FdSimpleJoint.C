@@ -57,9 +57,8 @@ FdSimpleJoint::FdSimpleJoint(FmSMJointBase* pt) : FdObject()
   FdBackPointer* bp_pointer = SO_GET_PART(itsKit,"backPt",FdBackPointer);
   bp_pointer->setPointer(this);
 
-  // Set up back pointer connections in the kit
-  // (The pointers in the master and slave are set equal to
-  // the triads in updateFdTopology)
+  // Set up back pointer connections in the kit.
+  // The pointers in the joint triads are set in updateFdTopology().
   itsKit->setPart("joint.backPt",bp_pointer);
   itsKit->setPart("master.backPt",bp_pointer);
   itsKit->setPart("slave.backPt",bp_pointer);
@@ -95,20 +94,21 @@ bool FdSimpleJoint::updateFdTopology(bool updateChildrenDisplay)
   FdAppearanceKit* appearanceKit = NULL;
   FdBackPointer* backPt = NULL;
 
-  // Set Slave transform and backPt connection
+  // Set transform and backPt connection for the dependent triad
 
-  FmTriad* slave = ((FmJointBase*)itsFmOwner)->getSlaveTriad();
-  if (slave)
+  FmTriad* depTriad = ((FmJointBase*)itsFmOwner)->getSlaveTriad();
+  if (depTriad)
   {
-    transLink = SO_GET_PART(slave->getFdPointer()->getKit(),"firstTrans",SoTransform);
-    transLocal = SO_GET_PART(slave->getFdPointer()->getKit(),"secondTrans",SoTransform);
-    appearanceKit = SO_GET_PART(slave->getFdPointer()->getKit(),"appearance",FdAppearanceKit);
-    backPt = SO_GET_PART(slave->getFdPointer()->getKit(),"backPt",FdBackPointer);
+    SoBaseKit* depKit = depTriad->getFdPointer()->getKit();
+    transLink = SO_GET_PART(depKit,"firstTrans",SoTransform);
+    transLocal = SO_GET_PART(depKit,"secondTrans",SoTransform);
+    appearanceKit = SO_GET_PART(depKit,"appearance",FdAppearanceKit);
+    backPt = SO_GET_PART(depKit,"backPt",FdBackPointer);
   }
   else
   {
-    // Joints should always have a slave triad
-    std::cerr <<"FdSimpleJoint::updateFdTopology: No slave triad in "
+    // Joints should always have a dependent triad
+    std::cerr <<"FdSimpleJoint::updateFdTopology(): No dependent triad in "
               << itsFmOwner->getIdString(true) << std::endl;
     transLink = new SoTransform;
     transLocal= new SoTransform;
@@ -119,22 +119,23 @@ bool FdSimpleJoint::updateFdTopology(bool updateChildrenDisplay)
   itsKit->setPart("slave.appearance",appearanceKit);
   itsKit->setPart("slave.backPt",backPt);
 
-  // Set Master transform and backPt connection
+  // Set transforma and backPt connection for the independent triad
 
-  FmTriad* master = ((FmSMJointBase*)itsFmOwner)->getItsMasterTriad();
-  if (master)
+  FmTriad* triad = ((FmSMJointBase*)itsFmOwner)->getItsMasterTriad();
+  if (triad)
   {
-    transLink = SO_GET_PART(master->getFdPointer()->getKit(),"firstTrans",SoTransform);
-    transLocal = SO_GET_PART(master->getFdPointer()->getKit(),"secondTrans",SoTransform);
-    appearanceKit = SO_GET_PART(master->getFdPointer()->getKit(),"appearance",FdAppearanceKit);
-    backPt = SO_GET_PART(master->getFdPointer()->getKit(),"backPt",FdBackPointer);
+    SoBaseKit* triadKit = triad->getFdPointer()->getKit();
+    transLink = SO_GET_PART(triadKit,"firstTrans",SoTransform);
+    transLocal = SO_GET_PART(triadKit,"secondTrans",SoTransform);
+    appearanceKit = SO_GET_PART(triadKit,"appearance",FdAppearanceKit);
+    backPt = SO_GET_PART(triadKit,"backPt",FdBackPointer);
   }
   else
   {
-    // There is no master triad (this might be a modeling error)
-    std::cout <<"FdSimpleJoint::updateFdTopology: No master triad in "
+    // There is no independent triad (this might be a modeling error)
+    std::cout <<"FdSimpleJoint::updateFdTopology(): No independent triad in "
               << itsFmOwner->getIdString(true) << std::endl;
-    // Transformation is set equal to slave transformation
+    // Transform is set equal to that of the dependent triad
     backPt = new FdBackPointer;
   }
 
@@ -149,17 +150,18 @@ bool FdSimpleJoint::updateFdTopology(bool updateChildrenDisplay)
   SoTransform* jointTransLocal = SO_GET_PART(itsKit,"joint.secondTrans",SoTransform);
   jointTransLocal->setMatrix(SbMatrix::identity());
   FaMat34 jcs = ((FmJointBase*)itsFmOwner)->getLocalCS();
-  if (master)
+  if (triad)
   {
-    // Needs to handle that the slavelink xf is actually used for the master as well,
-    // to make it follow during the animation (smart move)
-    SbMatrix masterMx;
-    masterMx.setTransform(transLocal->translation.getValue(),
-		          transLocal->rotation.getValue(),
-			  transLocal->scaleFactor.getValue());
-    jcs = FdConverter::toFaMat34(masterMx) * jcs;
+    // Needs to handle that the transform of the dependent link
+    // is actually used for the independent link as well,
+    // to make it follow during the smart-move animation
+    SbMatrix mx;
+    mx.setTransform(transLocal->translation.getValue(),
+                    transLocal->rotation.getValue(),
+                    transLocal->scaleFactor.getValue());
+    jcs = FdConverter::toFaMat34(mx) * jcs;
 #ifdef FD_DEBUG
-    std::cout <<" Joint location from master:"<< jcs << std::endl;
+    std::cout <<" Joint location from independent triad:"<< jcs << std::endl;
 #endif
   }
   jointTransLocal->setMatrix(FdConverter::toSbMatrix(jcs));

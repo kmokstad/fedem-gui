@@ -97,7 +97,7 @@ void FuiTriadSummary::placeWidgets(int width, int height)
   int h9 = h10 - fontHeight;
 
   myFENodeField->setEdgeGeometry(v1,v4,h3,h4);
-  myTriadLabel->setEdgeGeometry(v1,v4,h9,h10);
+  myTriadLabel->setEdgeGeometry(v1,v8,h9,h10);
 
   h4 += 2*vBorder;
   mySetAllFreeButton->setEdgeGeometry(v1,v4,h4,h4+fieldHeight);

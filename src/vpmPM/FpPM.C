@@ -1255,7 +1255,7 @@ bool FpPM::vpmModelSave(bool pruneEmptyDirs)
   // Reset simulation event modifications, if any
   bool didSwitchEvent = FapSimEventHandler::activate(NULL,true,false);
   if (didSwitchEvent)
-    ListUI <<"===> Switching to master Simulation event.\n";
+    ListUI <<"===> Switching to main Simulation event.\n";
 
   // Delete in-active joint springs, -dampers, -loads and -motions
   bool purgeOnSave = false;
@@ -1310,7 +1310,7 @@ bool FpPM::vpmModelSave(bool pruneEmptyDirs)
 	   <<"     If you exit Fedem now you will loose any unsaved data.\n\n";
 
   else if (didSwitchEvent)
-    // Reopen the RDB for the master event
+    // Reopen the RDB for the main event
     FpModelRDBHandler::RDBOpen(mech->getResultStatusData(),mech);
 
   return isModelSaved;
@@ -1640,7 +1640,7 @@ bool FpPM::vpmModelSaveAs(const std::string& name, bool saveReducedParts,
 
   // Reset simulation event changes, if any
   if (FapSimEventHandler::activate(NULL,true,false))
-    ListUI <<"===> Switching to master Simulation event.\n";
+    ListUI <<"===> Switching to main Simulation event.\n";
 
   Fui::noUserInputPlease();
   ListUI <<"===> Saving Fedem model in "<< name <<"\n";
@@ -1812,7 +1812,7 @@ bool FpPM::vpmModelExport(const std::string& name, FmAnalysis* analysis, const c
 
   // Reset simulation event changes, if any
   if (FapSimEventHandler::activate(NULL,true,false))
-    ListUI <<"===> Switching to master Simulation event.\n";
+    ListUI <<"===> Switching to main Simulation event.\n";
 
   Fui::noUserInputPlease();
   ListUI <<"===> Exporting Fedem model to "<< name <<"\n";

@@ -191,22 +191,22 @@ bool FdTire::updateFdTopology(bool)
   SoTransform* transLocal;
   SoTransform* transLink;
   FmJointBase* bearing = ((FmTire*)itsFmOwner)->bearingJoint.getPointer();
-  FmTriad*     slave   = bearing ? bearing->getSlaveTriad() : NULL;
+  FmTriad*     spindel = bearing ? bearing->getSlaveTriad() : NULL;
 
-  // Set slave transform and backPt connection
-  if (slave)
-    {
-      transLink = SO_GET_PART(slave->getFdPointer()->getKit(),"firstTrans",SoTransform);
-      transLocal = SO_GET_PART(slave->getFdPointer()->getKit(),"secondTrans",SoTransform);
-    }
+  // Set spindel transform and backPt connection
+  if (spindel)
+  {
+    transLink  = SO_GET_PART(spindel->getFdPointer()->getKit(),"firstTrans",SoTransform);
+    transLocal = SO_GET_PART(spindel->getFdPointer()->getKit(),"secondTrans",SoTransform);
+  }
   else
-    {
-      // Joints should always have a slave triad
-      std::cout <<"No slave triad in bearing joint of "
-		<< itsFmOwner->getIdString(true) << std::endl;
-      transLink = new SoTransform;
-      transLocal= new SoTransform;
-    }
+  {
+    // Joints should always have a dependent triad
+    std::cout <<"No dependent triad (spindel) in bearing joint of "
+              << itsFmOwner->getIdString(true) << std::endl;
+    transLink = new SoTransform;
+    transLocal= new SoTransform;
+  }
 
   itsKit->setPart("transform",transLink);
   itsKit->setPart("transform2",transLocal);

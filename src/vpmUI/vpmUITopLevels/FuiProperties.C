@@ -462,13 +462,13 @@ void FuiProperties::initWidgets()
   myJointResults->setToggleCB(FFaDynCB1M(FuiProperties,this,onBoolChanged,bool));
   myJointResults->popDown();
 
-  mySwapTriadButton->setLabel("Swap Master and Slave Triad");
+  mySwapTriadButton->setLabel("Swap Joint Triads");
   mySwapTriadButton->popDown();
 
-  myAddMasterButton->setLabel("Add Master");
+  myAddMasterButton->setLabel("Add glider Triad");
   myAddMasterButton->popDown();
 
-  myRevMasterButton->setLabel("Reverse Masters");
+  myRevMasterButton->setLabel("Reverse glider Triads");
   myRevMasterButton->popDown();
 
   // Pipe Surface
@@ -2405,21 +2405,21 @@ void FuiProperties::buildDynamicWidgets(const FFuaUIValues* values)
     myRiserMudLevelField->popDown();
   }
 
-  // Swap Master and Slave :
+  // Swap joint triads :
 
   if (pv->showSwapTriadButton)
     mySwapTriadButton->popUp();
   else
     mySwapTriadButton->popDown();
 
-  // Add Masters :
+  // Add glider triads :
 
   if (pv->showAddMasterButton)
     myAddMasterButton->popUp();
   else
     myAddMasterButton->popDown();
 
-  // Reverse Masters :
+  // Reverse the glider triads :
 
   if (pv->showReverseMasterButton)
     myRevMasterButton->popUp();
@@ -3414,12 +3414,12 @@ void FuiProperties::setUIValues(const FFuaUIValues* values)
       myTriadSummary->myConnectorMenu->selectOption(pv->myTriadConnector-2);
 
     if (pv->isSlave)
-      myTriadSummary->myTriadLabel->setLabel("This is a slave triad");
+      myTriadSummary->myTriadLabel->setLabel("This is a dependent joint triad");
     else if (pv->isMaster)
       if (pv->myTriadVals.empty())
-	myTriadSummary->myTriadLabel->setLabel("This is a grounded master triad");
+	myTriadSummary->myTriadLabel->setLabel("This is a grounded independent triad");
       else
-	myTriadSummary->myTriadLabel->setLabel("This is a master triad");
+	myTriadSummary->myTriadLabel->setLabel("This is an independent joint triad");
     else if (pv->myTriadVals.empty())
       myTriadSummary->myTriadLabel->setLabel("This triad is grounded");
     else
@@ -3637,7 +3637,7 @@ void FuiProperties::setUIValues(const FFuaUIValues* values)
     myEventProbability->setValue(pv->mySimEventProbability);
     mySelectEventButton->setSensitivity(pv->allowSimEventChange);
     if (pv->showActiveEvent) {
-      mySelectEventButton->setLabel("Revert to master event");
+      mySelectEventButton->setLabel("Revert to main event");
       myActiveEventLabel->popUp();
     }
     else {
@@ -4335,7 +4335,7 @@ void FuiProperties::setSensitivity(bool makeSensitive)
 
   for (FuiTriadDOF* tdof : myTriadDofs)
   {
-    if (IAmShowingTriadData == 2) // slave triad
+    if (IAmShowingTriadData == 2) // dependent triad
     {
       tdof->motionType->setSensitivity(false);
       tdof->variableType->setSensitivity(false);

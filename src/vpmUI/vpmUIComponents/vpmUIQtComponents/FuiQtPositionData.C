@@ -127,13 +127,13 @@ FuiQtPositionData::FuiQtPositionData(QWidget* parent, int xpos, int ypos,
   vLayout->setSpacing(2);
   vLayout->setAlignment(Qt::AlignTop);
 
-  FFuQtToggleButton* masterToggle = new FFuQtToggleButton();
-  masterToggle->setText("Master triad follows joint");
-  vLayout->addWidget(masterToggle);
-
-  FFuQtToggleButton* slaveToggle = new FFuQtToggleButton();
-  slaveToggle->setText("Slave triad follows joint");
-  vLayout->addWidget(slaveToggle);
+  FFuQtToggleButton* toggle;
+  myMasterFollowToggle = toggle = new FFuQtToggleButton();
+  toggle->setText("Independent triad follows joint");
+  vLayout->addWidget(toggle);
+  mySlaveFollowToggle = toggle = new FFuQtToggleButton();
+  toggle->setText("Dependent triad follows joint");
+  vLayout->addWidget(toggle);
 
   followFrame->setLayout(vLayout);
   myLayout->addWidget(followFrame, 1, 1, Qt::AlignTop);
@@ -151,8 +151,6 @@ FuiQtPositionData::FuiQtPositionData(QWidget* parent, int xpos, int ypos,
     myFields.push_back(field);
 
   myTriadPosFollowFrame = followFrame;
-  myMasterFollowToggle = masterToggle;
-  mySlaveFollowToggle = slaveToggle;
 
   this->initWidgets();
 }

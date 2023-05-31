@@ -2200,7 +2200,7 @@ void FapUAProperties::addJointDescendantTopology(std::vector<FuiTopologyItem>& t
   for (size_t i = 0; i < triads.size(); i++)
     if (triads[i])
     {
-      this->addTopologyItem(topol,triads[i],level,i?"Master":"Slave");
+      this->addTopologyItem(topol,triads[i],level,i?"Independent":"Dependent");
       for (size_t j = 0; (owner = triads[i]->getOwnerLink(j)); j++)
 	this->addTopologyItem(topol,owner,level+1);
     }
@@ -4010,7 +4010,7 @@ void FapUAProperties::simEventSelectedCB()
   if (FapSimEventHandler::activate(event))
     FFaMsg::list("===> Switching to " + event->getIdString(true) + "\n");
   else if (FapSimEventHandler::activate(NULL))
-    FFaMsg::list("===> Reverted to master event.\n");
+    FFaMsg::list("===> Reverted to main event.\n");
 }
 
 

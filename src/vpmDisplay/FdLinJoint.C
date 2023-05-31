@@ -60,8 +60,8 @@ FdLinJoint::FdLinJoint(FmMMJointBase* pt) : FdObject()
   bp_pointer->setPointer(this);
 
   // Set up back pointer connections in the kit.
-  // The master connection has to be set up for each master.
-  // This is done in FdLinJoint::updateFdTopology()
+  // The connection for each glider triad
+  // is done in FdLinJoint::updateFdTopology().
   itsKit->setPart("slave.backPt",bp_pointer);
   itsKit->setPart("lineSymbol.backPt",bp_pointer);
 }
@@ -92,7 +92,7 @@ bool FdLinJoint::updateFdTopology(bool updateChildrenDisplay)
   FdSprDaTransformKit* lineSymbol;
   FdTransformKit* transformKit;
 
-  // Set up slave part of the joint:
+  // Set up dependent part of the joint:
 
   FmTriad* triad = ((FmJointBase*)itsFmOwner)->getSlaveTriad();
   if (triad)
@@ -104,8 +104,8 @@ bool FdLinJoint::updateFdTopology(bool updateChildrenDisplay)
   }
   else
   {
-    // Joints should always have a slave triad
-    std::cerr <<"FdLinJoint::updateFdTopology:: No slave triad in "
+    // Joints should always have a dependent triad
+    std::cerr <<"FdLinJoint::updateFdTopology:: No dependent triad in "
               << itsFmOwner->getIdString(true) << std::endl;
     transLink = new SoTransform;
     transLocal = new SoTransform;
@@ -116,17 +116,17 @@ bool FdLinJoint::updateFdTopology(bool updateChildrenDisplay)
   itsKit->setPart("slave.appearance",appearanceKit);
   itsKit->setPart("slave.backPt",backPt);
 
-  // Set up master part of the joint:
+  // Set up independent part of the joint:
 
-  std::vector<FmTriad*> masters;
-  ((FmMMJointBase*)itsFmOwner)->getMasterTriads(masters);
+  std::vector<FmTriad*> triads;
+  ((FmMMJointBase*)itsFmOwner)->getMasterTriads(triads);
 
   SoNodeKitListPart* masterList = SO_GET_PART(itsKit,"masterList",SoNodeKitListPart);
   for (int c = masterList->getNumChildren()-1; c >= 0; c--)
     masterList->removeChild(c);
 
   int idx = 0;
-  for (FmTriad* triad : masters)
+  for (FmTriad* triad : triads)
   {
     transLink = SO_GET_PART(triad->getFdPointer()->getKit(),"firstTrans",SoTransform);
     transLocal = SO_GET_PART(triad->getFdPointer()->getKit(),"secondTrans",SoTransform);
@@ -201,36 +201,21 @@ bool FdLinJoint::updateFdApperance()
 }
 
 
-bool FdLinJoint::updateFdDetails()
+void FdLinJoint::show(bool doShow)
 {
-  if (!itsFmOwner) return false;
-
-  // Set the slave and line symbols
-
-  if (itsFmOwner->isOfType(FmCylJoint::getClassTypeID()))
+  if (!doShow || !itsFmOwner)
+    itsKit->setPart("slave.symbol", NULL);
+  else if (itsFmOwner->isOfType(FmCylJoint::getClassTypeID()))
     itsKit->setPart("slave.symbol", FdSymbolDefs::getSymbol(FdSymbolDefs::LINCYL_SLAVE));
   else
     itsKit->setPart("slave.symbol", FdSymbolDefs::getSymbol(FdSymbolDefs::LINPRISM_SLAVE));
 
-  itsKit->setPart("lineSymbol.symbol", FdSymbolDefs::getSymbol(FdSymbolDefs::LINJOINT_LINE));
+  itsKit->setPart("lineSymbol.symbol", doShow ? FdSymbolDefs::getSymbol(FdSymbolDefs::LINJOINT_LINE) : NULL);
 
-  SoNodeKitListPart* masterList = SO_GET_PART(itsKit,"masterList",SoNodeKitListPart);
-  int nMasters = masterList->getNumChildren();
-  for (int i = 0; i < nMasters; i++)
-    ((SoBaseKit*)masterList->getChild(i))->setPart("symbol",FdSymbolDefs::getSymbol(FdSymbolDefs::LINJOINT_MASTER));
-
-  return true;
-}
-
-
-void FdLinJoint::hide()
-{
-  itsKit->setPart("slave.symbol", NULL);
-  itsKit->setPart("lineSymbol.symbol", NULL);
-  SoNodeKitListPart* masterList = SO_GET_PART(itsKit, "masterList", SoNodeKitListPart);
-  int nMasters = masterList->getNumChildren();
-  for (int i = 0; i < nMasters; i++)
-    ((SoBaseKit*)masterList->getChild(i))->setPart("symbol", NULL);
+  SoNodeKitListPart* triads = SO_GET_PART(itsKit, "masterList", SoNodeKitListPart);
+  int nTriads = triads->getNumChildren();
+  for (int i = 0; i < nTriads; i++)
+    ((SoBaseKit*)triads->getChild(i))->setPart("symbol", doShow ? FdSymbolDefs::getSymbol(FdSymbolDefs::LINJOINT_MASTER) : NULL);
 }
 
 
@@ -293,33 +278,33 @@ int FdLinJoint::isNotBetween(const FaVec3& p, const FaVec3& p1,
 
 void FdLinJoint::smartMove(const FaVec3& p1, const FaVec3& p2, const FaDOF& dof)
 {
-  std::vector<FmTriad*> masterTriads;
-  ((FmMMJointBase*)itsFmOwner)->getMasterTriads(masterTriads);
-  size_t nMasters = masterTriads.size();
-  if (nMasters < 2) return;
+  std::vector<FmTriad*> triads;
+  ((FmMMJointBase*)itsFmOwner)->getMasterTriads(triads);
+  size_t nTriads = triads.size();
+  if (nTriads < 2) return;
 
   std::vector<FmTriad*> jointTriads;
-  jointTriads.reserve(nMasters+1);
+  jointTriads.reserve(nTriads+1);
 
-  FmTriad* slaveTriad = ((FmMMJointBase*)itsFmOwner)->getSlaveTriad();
-  FaVec3 s1, s2, slavePos = slaveTriad->getTranslation();
+  FmTriad* depTriad = ((FmMMJointBase*)itsFmOwner)->getSlaveTriad();
+  FaVec3 s1, s2, sliderPos = depTriad->getTranslation();
 
   size_t i = 0;
   bool isClosestToFirst;
-  for (i = 0; i < nMasters; i++) {
-    if (slaveTriad) {
-      s1 = masterTriads[i]->getLocalCS().translation();
-      s2 = masterTriads[i+1]->getLocalCS().translation();
-      if (!isNotBetween(slavePos,s1,s2,isClosestToFirst)) {
-	jointTriads.push_back(slaveTriad);
-	slaveTriad = NULL;
+  for (i = 0; i < nTriads; i++) {
+    if (depTriad) {
+      s1 = triads[i]->getLocalCS().translation();
+      s2 = triads[i+1]->getLocalCS().translation();
+      if (!isNotBetween(sliderPos,s1,s2,isClosestToFirst)) {
+        jointTriads.push_back(depTriad);
+        depTriad = NULL;
       }
     }
-    jointTriads.push_back(masterTriads[i]);
+    jointTriads.push_back(triads[i]);
   }
 
-  if (slaveTriad)
-    jointTriads.push_back(slaveTriad);
+  if (depTriad)
+    jointTriads.push_back(depTriad);
 
 
   // Find the two triads the attacking point is between :
@@ -328,8 +313,8 @@ void FdLinJoint::smartMove(const FaVec3& p1, const FaVec3& p2, const FaDOF& dof)
   long nearest2Idx = 0;
   long nearestTriadIdx = -1;
 
-  for (i = 0; i < nMasters; i++) // It is nMasters+1 triads in the
-  {                              // array but we don't do this for the last triad
+  for (i = 0; i < nTriads; i++) // It is nTriads+1 triads in the array
+  {                             // but we don't do this for the last triad
     s1 = jointTriads[i]->getLocalCS().translation();
     s2 = jointTriads[i+1]->getLocalCS().translation();
     int notBetween = this->isNotBetween(p1,s1,s2,isClosestToFirst);
@@ -348,11 +333,11 @@ void FdLinJoint::smartMove(const FaVec3& p1, const FaVec3& p2, const FaDOF& dof)
       nearestTriadIdx = i;
       break;
     }
-    else if (i == nMasters-1)
+    else if (i == nTriads-1)
     {
-      nearest1Idx = nMasters;
-      nearest2Idx = nMasters+1; // that's one outside the array
-      nearestTriadIdx = nMasters;
+      nearest1Idx = nTriads;
+      nearest2Idx = nTriads+1; // that's one outside the array
+      nearestTriadIdx = nTriads;
       break;
     }
   }
@@ -363,8 +348,8 @@ void FdLinJoint::smartMove(const FaVec3& p1, const FaVec3& p2, const FaDOF& dof)
     if (jointTriads[j]->hasStickers() || jointTriads[j]->isAttached())
       bwdStopperIdx = j;
 
-  size_t fwdStopperIdx = nMasters+1;
-  for (i = nearest2Idx; i <= nMasters && fwdStopperIdx > nMasters; i++)
+  size_t fwdStopperIdx = nTriads+1;
+  for (i = nearest2Idx; i <= nTriads && fwdStopperIdx > nTriads; i++)
     if (jointTriads[i]->hasStickers() || jointTriads[i]->isAttached())
       fwdStopperIdx = i;
 
@@ -372,7 +357,7 @@ void FdLinJoint::smartMove(const FaVec3& p1, const FaVec3& p2, const FaDOF& dof)
   long int idx2 = nearest2Idx;
   if (nearest1Idx < 0)
     ++idx1, ++idx2;
-  else if (nearest2Idx > (long int)nMasters)
+  else if (nearest2Idx > (long int)nTriads)
     --idx1, --idx2;
 
   FaVec3 lineDirection = jointTriads[idx2]->getLocalCS().translation() - jointTriads[idx1]->getLocalCS().translation();
@@ -473,14 +458,14 @@ void FdLinJoint::smartMove(const FaVec3& p1, const FaVec3& p2, const FaDOF& dof)
 
   if (jointTriads[nearestTriadIdx]->isSlaveTriad())
     {
-      for (i = 0; i <= nMasters; i++)
+      for (i = 0; i <= nTriads; i++)
 	{
 	  FdTriad* displayTriad = (FdTriad*)(jointTriads[i]->getFdPointer());
 	  triadTransform = SO_GET_PART(displayTriad->getKit(),"secondTrans",SoTransform);
 	  if ((long int)i == nearestTriadIdx)
 	    {
 	      if (goingFwd)
-		stopperPos = jointTriads[nMasters]->getLocalCS().translation();
+		stopperPos = jointTriads[nTriads]->getLocalCS().translation();
 	      else
 		stopperPos = p0;
 
@@ -506,7 +491,7 @@ void FdLinJoint::smartMove(const FaVec3& p1, const FaVec3& p2, const FaDOF& dof)
       // Cropping translation to be within stoppers :
       if (goingFwd)
 	{
-	  if (fwdStopperIdx <= nMasters)
+	  if (fwdStopperIdx <= nTriads)
 	    {
 	      stopperPos = jointTriads[fwdStopperIdx]->getLocalCS().translation();
 	      float lengthToStopper = (float)((stopperPos - p1OnLine).length() - (30 * FDPTPMOVE_TOLERANCE));  
@@ -522,10 +507,10 @@ void FdLinJoint::smartMove(const FaVec3& p1, const FaVec3& p2, const FaDOF& dof)
 	      actualTrans = ( ( lengthToStopper < actualTrans.length() ) ? lengthToStopper : actualTrans.length()) * transDirection;
 	    } 
 	}
-      // Loop troug all triads and move them :
-      for (i=0;i<nMasters+1;i++)
-	{ // for loop
-	  
+
+      // Loop trough all triads and move them :
+      for (i = 0; i <= nTriads; i++)
+	{
 	  if ((long int)i <= bwdStopperIdx || i >= fwdStopperIdx)
 	    {
 	      actualTriadTrans = SbVec3f(0,0,0);
@@ -553,7 +538,7 @@ void FdLinJoint::smartMove(const FaVec3& p1, const FaVec3& p2, const FaDOF& dof)
 		}
 	      else if ((long int)i >= nearest2Idx)
 		{
-		  if (fwdStopperIdx > nMasters)
+		  if (fwdStopperIdx > nTriads)
 		    {
 		      // Moving an open end: Do not crop.
 		      actualTriadTrans = actualTrans;
@@ -656,7 +641,7 @@ int FdLinJoint::getDegOfFreedom(SbVec3f& centerPoint, SbVec3f& direction)
     if (itsFmOwner->isOfType(FmCylJoint::getClassTypeID()))
     {
       centerPoint = FdConverter::toSbVec3f(triadCS.translation());
-      // Act as if the sticker is in origo of the slave
+      // Act as if the sticker is in origo of the dependent triad
       // but it might not be...
       return isStickersOnSlave ? REV : CYL;
     }
