@@ -161,15 +161,23 @@ void Fui::tip(const char* value)
 void Fui::setTitle(const char* title)
 {
   char newTitle[BUFSIZ];
-  sprintf(newTitle, "FEDEM %s - %s", FpPM::getVpmVersion(), title);
-
-  if (Fui::mainWindow) Fui::mainWindow->setTitle(newTitle);
-
-  sprintf(newTitle, "Output List: %s", title);
+  if (Fui::mainWindow)
+  {
+#ifdef FT_HAS_SOLVERS
+    const char* fmt = "FEDEM %s - %s";
+#else
+    const char* fmt = "connected products modeler %s - %s";
+#endif
+    sprintf(newTitle, fmt, FpPM::getVpmVersion(), title);
+    Fui::mainWindow->setTitle(newTitle);
+  }
 
   FFuTopLevelShell* uic = FFuTopLevelShell::getInstanceByType(FuiOutputList::getClassTypeID());
   if (uic)
+  {
+    sprintf(newTitle, "Output List: %s", title);
     dynamic_cast<FuiOutputList*>(uic)->setTitle(newTitle);
+  }
 }
 
 

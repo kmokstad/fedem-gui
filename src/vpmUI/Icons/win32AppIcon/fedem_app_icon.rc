@@ -10,7 +10,11 @@
 // Application Icons
 //
 
+#ifdef FT_HAS_SOLVERS
 IDI_ICON1    ICON    DISCARDABLE    "fedem_app_icon_ng.ico"
+#else
+IDI_ICON1    ICON    DISCARDABLE    "SAP_R_grad_scrn.ico"
+#endif
 128          ICON    DISCARDABLE    "FT_error_err.ico"
 129          ICON    DISCARDABLE    "FT_link_bdf.ico"
 130          ICON    DISCARDABLE    "FT_link_cad.ico"

@@ -93,7 +93,9 @@ void FapUAMainWindow::getCommands(FFuaUICommands* commands)
     cmds->menuBar.push_back(&this->addonsHeader);
 
   cmds->menuBar.push_back(&this->windowsHeader);
+#ifdef FT_HAS_SOLVERS
   cmds->menuBar.push_back(&this->helpHeader);
+#endif
 
   //file
   this->fileHeader.clear();

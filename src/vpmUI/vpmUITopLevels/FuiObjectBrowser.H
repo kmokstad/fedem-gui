@@ -30,10 +30,9 @@ public:
   FuiObjectBrowser();
   virtual ~FuiObjectBrowser() {}
 
-  static FuiObjectBrowser* create(int xpos = 100, int ypos = 100,
-				  int width = 100, int height = 100,
-				  const char* title= "Fedem Object Browser",
-				  const char* name = "FuiObjectBrowser");
+  static FuiObjectBrowser* create(int xpos, int ypos, int width, int height,
+                                  const char* title = "Object Browser",
+                                  const char* name = "FuiObjectBrowser");
 
 protected:
   void initWidgets();
