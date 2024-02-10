@@ -52,7 +52,7 @@ endif ( "${USE_QWTLIB}" STREQUAL "External" )
 # List all subfolders from the fedem foundation repository in this project
 #
 
-set ( USE_QT TRUE )
+set ( USE_QT Qt6 )
 set ( USE_VISUALS TRUE )
 set ( USE_VERTEXOBJ TRUE )
 set ( SUBFOLDER_LIST Admin FFaLib FFlLib FFrLib
@@ -142,3 +142,20 @@ if ( FTENV_VERBOSE )
   message ( STATUS "Installing Fedem to ${CMAKE_INSTALL_PREFIX}" )
 endif ( FTENV_VERBOSE )
 install ( TARGETS Fedem RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" )
+
+#
+# Install some Qt6 plugins
+#
+if ( WIN )
+  set ( PLUGINS platforms/qwindows.dll styles/qwindowsvistastyle.dll )
+  file ( TO_CMAKE_PATH $ENV{QT_ROOT}/plugins PLUGIN_PATH )
+  foreach ( PLUGIN ${PLUGINS} )
+    get_filename_component ( DIR ${PLUGIN} DIRECTORY )
+    if ( FTENV_VERBOSE )
+      message ( STATUS "Installing ${PLUGIN} to ${CMAKE_INSTALL_PREFIX}" )
+    endif ( FTENV_VERBOSE )
+    install ( FILES ${PLUGIN_PATH}/${PLUGIN}
+              DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/${DIR}"
+              CONFIGURATIONS Release RelWithDebInfo )
+  endforeach ( PLUGIN ${PLUGINS} )
+endif ( WIN )
