@@ -66,7 +66,7 @@ void FFuQtTopLevelShell::setTitle(const char* title)
 }
 
 
-void FFuQtTopLevelShell::blockThis(bool everything)
+void FFuQtTopLevelShell::blockThis(bool /*everything*/)
 {
   ourTopLevelsToBlock[this] = NULL;
 }
