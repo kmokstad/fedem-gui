@@ -7,10 +7,14 @@
 # Builds the LIB_ID library
 set ( LIB_ID FFdCadModel )
 
-if ( WIN AND Coin_library )
-  string ( APPEND CMAKE_CXX_FLAGS " -DCOIN_DLL" )
-  include_directories ( "$ENV{COIN_ROOT}/include" )
-endif ( WIN AND Coin_library )
+if ( Coin_library )
+  if ( WIN )
+    string ( APPEND CMAKE_CXX_FLAGS " -DCOIN_DLL" )
+  endif ( WIN )
+  if ( DEFINED ENV{COIN_ROOT} )
+    include_directories ( "$ENV{COIN_ROOT}/include" )
+  endif ( DEFINED ENV{COIN_ROOT} )
+endif ( Coin_library )
 
 
 ## Files with header and source with same name
