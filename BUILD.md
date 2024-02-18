@@ -14,6 +14,9 @@ and with Intel&reg; Fortran Compilers for the Fortran modules.
 The build system is based on the [CMake](https://cmake.org/) tool,
 which is embedded in the Visual Studio 2019 installation.
 
+See [below](#build-fedem-gui-application-on-linux) for ongoing effort to
+build the GUI application on Linux.
+
 ## Build of external 3rd-party modules
 
 Before you can build the FEDEM GUI itself, you first need to build and install
@@ -461,3 +464,55 @@ Proceed as follows:
       11 SET VERSION=8.0.0
       12 REM All binaries are assumed to have been built and placed in folder %INST_DIR%.
       13 SET INST_DIR=%USERPROFILE%\Fedem-install\3.0.1\bin
+
+## Build FEDEM GUI application on Linux
+
+It is possible to configure and build the GUI application on Linux as well.
+The following configuration steps has been used so far:
+
+- System: Ubuntu 22.04 with gcc 11.4
+
+- Qt packages: Install Qt 6.2 and dependencies using the package manager
+
+      sudo apt install libqt6core6 libqt6gui6 libqt6widgets6 libqt6opengl6
+      sudo apt install libvulkan-dev libxkbcommon-dev
+
+- Coin3D: Download the latest release from github. The binary package
+  [coin-4.0.2-Ubuntu2204-gcc11-x64](https://github.com/coin3d/coin/releases/download/v4.0.2/coin-4.0.2-Ubuntu2204-gcc11-x64.tar.gz)
+  can be used, unless you want to compile from the sources
+  [coin-4.0.2-src](https://github.com/coin3d/coin/releases/download/v4.0.2/coin-4.0.2-src.tar.gz).
+  Extract the binary package in arbitrary location, e.g., under `/usr/local/Coin3D`
+
+- SoQt: Download the latest version from github.
+  No binary package built with Qt 6 for Ubuntu is available, so here you need to build from the sources
+  [soqt-1.6.2-src](https://github.com/coin3d/soqt/releases/download/v1.6.2/soqt-1.6.2-src.tar.gz):
+
+      tar zxfv ~/Downloads/soqt-1.6.2-src.tar.gz
+      mkdir soqt/Release
+      cd soqt/Release
+      cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local/Coin3D -DSOQT_BUILD_TESTS=OFF
+      make
+      sudo make install
+
+  The `CMAKE_INSTALL_PREFIX` variable has to point to the location where you chose to extract the Coin package.
+
+- Smallchange: The lastest release on github is not compatible with Qt 6.
+  Therefore, we need to build this package from HEAD of the master branch:
+
+      git clone git@github.com:coin3d/smallchange.git
+      mkdir smallchange/Release
+      cd smallchange/Release
+      cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local/Coin3D
+      make
+      sudo make install
+
+- Configure and build FEDEM GUI from the qt6-port branch:
+
+      git clone -b qt6-port git@github.com:kmoks/fedem-gui.git
+      mkdir fedem-gui/Release fedem-gui/Debug
+      cd fedem-gui/Release
+      COIN_ROOT=/usr/local/Coin3D cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_QWTLIB=OFF
+      make
+      cd ../Debug
+      COIN_ROOT=/usr/local/Coin3D cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_QWTLIB=OFF
+      make
