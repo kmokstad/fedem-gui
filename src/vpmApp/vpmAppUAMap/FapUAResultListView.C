@@ -131,7 +131,7 @@ void FapUAResultListView::getChildren(FFaListViewItem* parent,
   if (!parent)
   {
     // Top headers
-    for (const std::pair<int,FmRingStart*>& head : *FmDB::getHeadMap())
+    for (const std::pair<const int,FmRingStart*>& head : *FmDB::getHeadMap())
       if (!head.second->getParent() && head.second->hasRingMembers())
       {
         if (head.second->getRingMemberType() == FmSubAssembly::getClassTypeID())
@@ -218,7 +218,7 @@ void FapUAResultListView::getChildren(FFaListViewItem* parent,
   else if (mmparent->isOfType(FmSubAssembly::getClassTypeID()))
   {
     // parent is a sub-assembly
-    for (const std::pair<int,FmRingStart*>& head : *static_cast<FmSubAssembly*>(mmparent)->getHeadMap())
+    for (const std::pair<const int,FmRingStart*>& head : *static_cast<FmSubAssembly*>(mmparent)->getHeadMap())
       if (!head.second->getParent() && head.second->hasRingMembers())
       {
         if (head.second->getRingMemberType() == FmSubAssembly::getClassTypeID())
