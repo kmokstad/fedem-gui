@@ -694,10 +694,7 @@ FdQtViewer::parallellView()
 // long. Ratio is max 5.0f. This feature is currently not used anywhere in Fedem.
 void FdQtViewer::anisotropicView(bool horz, float ratio)
 {
-  SoSceneManager* pSM = getSceneManager();
-  if (pSM == NULL)
-    return;
-  SbViewportRegion vr(pSM->getViewportRegion());
+  SbViewportRegion vr(getViewportRegion());
   SbVec2s o = vr.getViewportOriginPixels();
   SbVec2s s = vr.getViewportSizePixels();
   
@@ -721,7 +718,7 @@ void FdQtViewer::anisotropicView(bool horz, float ratio)
   }
   
   vr.setViewportPixels(o,s);
-  pSM->setViewportRegion(vr);
+  setViewportRegion(vr);
 
   SoCamera* camera = this->getCamera();
   if (camera) camera->viewportMapping = SoCamera::LEAVE_ALONE;

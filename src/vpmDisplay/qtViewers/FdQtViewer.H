@@ -11,8 +11,16 @@
 #include <QtCore/QPointer>
 #include <QtGui/QCursor>
 
+#if defined(QUARTER_DLL)
+#include "FdQuarterViewer.H"
+#elif defined(SOQT_DLL)
 #include <Inventor/Qt/viewers/SoQtViewer.h>
+#else
+  #error "No QUARTER_DLL nor SOQT_DLL have been defined"
+#endif
+
 #include <Inventor/SbLinear.h>
+#include <Inventor/nodes/SoSeparator.h>
 
 #include "FFaLib/FFaDynCalls/FFaDynCB.H"
 #ifndef NO_FFU

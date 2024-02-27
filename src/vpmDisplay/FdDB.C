@@ -106,7 +106,13 @@
 #include <windows.h>
 #endif
 
+#if defined(QUARTER_DLL)
+#include <Quarter/Quarter.h>
+#elif defined(SOQT_DLL)
 #include <Inventor/Qt/SoQt.h>
+#else
+#error "Neither QUARTER_DLL nor SOQT_DLL have been defined"
+#endif
 
 #include <Inventor/SoDB.h>
 #include <Inventor/SoInput.h>
@@ -253,7 +259,13 @@ void FdDB::init()
   coin_setenv("SOQT_NO_X11_ERRORHANDLER", "1", 1);
 #endif
 
+#if defined(QUARTER_DLL)
+  SIM::Coin3D::Quarter::Quarter::init();
+#elif defined(SOQT_DLL)
   SoQt::init(dynamic_cast<QWidget*>(Fui::getMainWindow()));
+#else
+  #error "No QUARTER_DLL nor SOQT_DLL have been defined"
+#endif
 #ifdef USE_SMALLCHANGE
   smallchange_init();
 #endif
