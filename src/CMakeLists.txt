@@ -35,23 +35,19 @@ else ( Coin_library )
   message ( STATUS "Coin library not available, configuring without 3D view" )
 endif ( Coin_library )
 
-set ( USE_QWTLIB "Internal" CACHE STRING "Build Fedem GUI with Qwt curve plotting" )
+set ( USE_QWTLIB "OFF" CACHE STRING "Build Fedem GUI with Qwt curve plotting" )
 set_property ( CACHE USE_QWTLIB PROPERTY STRINGS Internal External OFF )
 if ( "${USE_QWTLIB}" STREQUAL "External" )
   find_package ( Qwt )
-  if ( Qwt_FOUND )
-    string ( APPEND CXX_FLAGS " -DFT_HAS_GRAPHVIEW" )
-  else ( Qwt_FOUND )
-    message ( STATUS "Qwt library not available, configuring without graph view" )
-  endif ( Qwt_FOUND )
 elseif ( "${USE_QWTLIB}" STREQUAL "Internal" )
   set ( Qwt_LIBRARY TRUE )
-  string ( APPEND CXX_FLAGS " -DFT_HAS_GRAPHVIEW" )
-  include_directories ( "${CMAKE_CURRENT_SOURCE_DIR}/Qwt/src" )
+elseif ( "${USE_QWTLIB}" STREQUAL "ON" )
+  set ( USE_QWTLIB "Internal" )
+  set ( Qwt_LIBRARY TRUE )
 endif ( "${USE_QWTLIB}" STREQUAL "External" )
 
 #
-# List all subfolders from the fedem foundation repository in this project
+# List all subfolders from the fedem-foundation repository in this project
 #
 
 set ( USE_QT Qt6 )
@@ -78,8 +74,8 @@ if ( WIN )
 
 # Check if the COM-API should be included
 # or if the program should be run with console window
-  option ( USE_COMAPI "Build Fedem with the COM-API" true )
-  option ( NO_CONSOLE_WINDOW "Build fedem without console window" true )
+  option ( USE_COMAPI "Build Fedem with the COM-API" ON )
+  option ( NO_CONSOLE_WINDOW "Build fedem without console window" ON )
   mark_as_advanced ( USE_COMAPI NO_CONSOLE_WINDOW )
 
   if ( USE_COMAPI )
@@ -101,8 +97,18 @@ if ( WIN )
   set ( APP_ICON "vpmUI/Icons/win32AppIcon/fedem_app_icon.rc" )
 endif ( WIN )
 
-set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAGS}" CACHE STRING "Flags needed by the C++ compiler" FORCE )
-set ( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}" CACHE STRING "Flags needed by the linker" FORCE )
+if ( Qwt_LIBRARY )
+  string ( APPEND CXX_FLAGS " -DFT_HAS_GRAPHVIEW" )
+  if ( "${USE_QWTLIB}" STREQUAL "Internal" )
+    include_directories ( "${CMAKE_CURRENT_SOURCE_DIR}/Qwt/src" )
+  endif ( "${USE_QWTLIB}" STREQUAL "Internal" )
+elseif ( NOT "${USE_QWTLIB}" STREQUAL "OFF" )
+  message ( STATUS "Qwt library not available, configuring without graph view" )
+  set ( USE_QWTLIB "OFF" )
+endif ( Qwt_LIBRARY )
+
+string ( APPEND CMAKE_CXX_FLAGS " ${CXX_FLAGS}" )
+string ( APPEND CMAKE_EXE_LINKER_FLAGS " ${LINKER_FLAGS}" )
 
 #
 # All folders to use in the build process
@@ -111,9 +117,9 @@ set ( SUBFOLDER_LIST FFuLib vpmUI vpmApp vpmPM )
 if ( Coin_library )
   list ( APPEND SUBFOLDER_LIST vpmDisplay FFdCadModel )
 endif ( Coin_library )
-if ( ${USE_QWTLIB} STREQUAL "Internal" )
+if ( "${USE_QWTLIB}" STREQUAL "Internal" )
   list ( INSERT SUBFOLDER_LIST 0 Qwt )
-endif ( ${USE_QWTLIB} STREQUAL "Internal" )
+endif ( "${USE_QWTLIB}" STREQUAL "Internal" )
 
 foreach ( FOLDER ${SUBFOLDER_LIST} )
   add_subdirectory ( ${FOLDER} )
