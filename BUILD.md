@@ -400,7 +400,7 @@ Proceed as follows:
 ## Build FEDEM GUI application on Linux
 
 It is possible to configure and build the GUI application on Linux as well.
-The following configuration steps has been used so far:
+The following configuration steps have been used so far:
 
 - System: Ubuntu 22.04 with gcc 11.4
 
@@ -438,13 +438,58 @@ The following configuration steps has been used so far:
       make
       sudo make install
 
+- Qwt (optional): If you want to build with the graph view widgets (curve plotting),
+      the Qwt package needs to be installed first. Build it from the git repository:
+
+      git clone https://git.code.sf.net/p/qwt/git Qwt
+      git checkout v6.3.0
+
+  To reduce the size of the build, some features not used in FEDEM may be deactivated by commenting out
+  these lines in the [qwtconfig.pri](https://sourceforge.net/p/qwt/git/ci/develop/tree/qwtconfig.pri) file:
+
+      89c89
+      < QWT_CONFIG       += QwtPolar
+      ---
+      > #QWT_CONFIG       += QwtPolar
+      103c103
+      < QWT_CONFIG     += QwtSvg
+      ---
+      > #QWT_CONFIG     += QwtSvg
+      117c117
+      < QWT_CONFIG     += QwtDesigner
+      ---
+      > #QWT_CONFIG     += QwtDesigner
+      140c140
+      < QWT_CONFIG     += QwtExamples
+      ---
+      > #QWT_CONFIG     += QwtExamples
+      151c151
+      < QWT_CONFIG     += QwtPlayground
+      ---
+      > #QWT_CONFIG     += QwtPlayground
+      158c158
+      < QWT_CONFIG     += QwtTests
+      ---
+      > #QWT_CONFIG     += QwtTests
+
+  Now configure, build and install the Qwt package through the commands:
+
+      qmake6 qwt.pro
+      make
+      sudo make install
+
+  This will install Qwt in the default location, which is `/usr/local/qwt-6.3.0-dev/`.
+  You may use any other location by editing the `QWT_INSTALL_PREFIX` variable in the `qwtconfig.pri` file,
+  before running the `qmake6` command.
+  In that case, remember to also modify [FindQwt.cmake](cmake/Modules/FindQwt.cmake) before proceeding.
+
 - Configure and build FEDEM GUI from the kmokstad/qt6-port branch:
 
       git clone -b qt6-port git@github.com:kmokstad/fedem-gui.git
       mkdir fedem-gui/Release fedem-gui/Debug
       cd fedem-gui/Release
-      COIN_ROOT=/usr/local/Coin3D cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_QWTLIB=OFF
+      COIN_ROOT=/usr/local/Coin3D cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_QWTLIB=External
       make
       cd ../Debug
-      COIN_ROOT=/usr/local/Coin3D cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_QWTLIB=OFF
+      COIN_ROOT=/usr/local/Coin3D cmake .. -DCMAKE_BUILD_TYPE=Debug -DUSE_QWTLIB=External
       make

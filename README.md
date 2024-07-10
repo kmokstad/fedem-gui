@@ -33,7 +33,7 @@ for overall information on the FEDEM project.
 The FEDEM GUI project relies on the following third-party modules,
 which are not included in this repository:
 
-* [Qt 4.8](https://download.qt.io/archive/qt/4.8/) -
+* [Qt 6.5](https://download.qt.io/archive/qt/6.5/) -
   Cross-platform graphical user interface framework
 * [Coin 4.0](https://github.com/coin3d/coin) -
   OpenGL-based 3D graphics library
@@ -43,6 +43,8 @@ which are not included in this repository:
   Some Open Inventor extensions for Coin
 * [Simage 1.8](https://github.com/coin3d/simage) -
   Library for saving images and animations from the Coin view
+* [Qwt 6.3](https://qwt.sourceforge.io/index.html) -
+  Framework for 2D curve plotting widgets
 * [zlib 1.2](https://zlib.net/) -
   File compression library
 
@@ -50,14 +52,9 @@ You need to build and install these modules separately,
 before building the FEDEM GUI application itself,
 see [here](BUILD.md#build-of-external-3rd-party-modules) for details.
 The first four of the packages above are mandatory,
-whereas the latter two are optional.
+whereas the latter three are optional.
 This means the build will work without them,
 but with some features being absent.
-
-In addition, we also use the library [Qwt 6.1.2](https://qwt.sourceforge.io/)
-for doing the 2D curve plotting.
-However, the sources for that library is embedded in this repository,
-in the [src/Qwt](src/Qwt) folder.
 
 Provided you have installed the third-party modules listed above,
 you can configure and build the FEDEM GUI from the sources by following
@@ -69,22 +66,24 @@ Many of the features in the FEDEM GUI can be activated/deactivated compile-time
 using command-line options on the form `-DUSE_(feature)=ON/OFF`
 when running cmake, where `=ON` activates a feature which is off by default,
 and `=OFF` deactivates a feature which is on by default.
-Currently, the following options can be specified to toggle features On or Off:
+Currently, the following options can be specified to toggle features on or off,
+with their default value in brackets [].
 
-* USE_CHSHAPE - Build with mooring line calculation support
-* USE_COMAPI - Build with the COM API
-* USE_CONTROL - Build with control system support
-* USE_DIGTWIN - Build with some Digitial Twin features
-* USE_FATIGUE - Build with durability calculation support
-* USE_FREQDOMAIN - Build with frequency-domain support
-* USE_MESHING - Build with FE meshing support
-* USE_OILWELL - Build with oil well modeling support
-* USE_RISER - Build with marine structures modeling support
-* USE_SEVENTS - Build with simulation event support
-* USE_SOLVERS - Build with solver support
-* USE_TIREAPI - Build with the Tire model API
-* USE_VTF - Build with VTF export support
-* USE_WINDPOW - Build with Wind turbine modeling support
+* USE_CHSHAPE - Build with mooring line calculation support [OFF]
+* USE_COMAPI - Build with the COM API [ON]
+* USE_CONTROL - Build with control system support [ON]
+* USE_DIGTWIN - Build with some Digitial Twin features [OFF]
+* USE_FATIGUE - Build with durability calculation support [OFF]
+* USE_FREQDOMAIN - Build with frequency-domain support [ON]
+* USE_MESHING - Build with FE meshing support [OFF]
+* USE_OILWELL - Build with oil well modeling support [OFF]
+* USE_QWTLIB - Build with Qwt curve plotting library [OFF]
+* USE_RISER - Build with marine structures modeling support [OFF]
+* USE_SEVENTS - Build with simulation event support [OFF]
+* USE_SOLVERS - Build with solver support [ON]
+* USE_TIREAPI - Build with the Tire model API [OFF]
+* USE_VTF - Build with VTF export support [OFF]
+* USE_WINDPOW - Build with Wind turbine modeling support [OFF]
 
 ## Installation
 
