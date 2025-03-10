@@ -94,6 +94,7 @@ FapUAGraphViewTLS::SignalConnector::SignalConnector(FapUAGraphViewTLS* ua) : own
 
 FapUAGraphViewTLS::SignalConnector::~SignalConnector()
 {
-  FFaSwitchBoard::removeAllOwnerConnections(this);
+  //TODO: Causes crash when deleting a graph while its graph view is open
+  //FFaSwitchBoard::removeAllOwnerConnections(this);
 }
 //----------------------------------------------------------------------------
