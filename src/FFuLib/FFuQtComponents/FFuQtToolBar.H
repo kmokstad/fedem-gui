@@ -12,25 +12,21 @@
 
 #include "FFuLib/FFuToolBar.H"
 #include "FFuLib/FFuQtBaseClasses/FFuQtComponentBase.H"
-#include "FFuLib/FFuAuxClasses/FFuaIdentifiers.H"
 
 
-class FFuQtToolBar : public QToolBar, virtual public FFuToolBar,
-		     public FFuQtComponentBase
+class FFuQtToolBar : public QToolBar, public FFuQtComponentBase,
+                     virtual public FFuToolBar
 {
 public:
   FFuQtToolBar(QWidget* parent);
-  virtual ~FFuQtToolBar() {}
 
 private:
-  virtual FFuToolButton* insertCmdItem(FFuaCmdItem* item);
+  virtual void insertCmdItem(FFuaCmdItem* item);
   virtual void updateCmdItem(FFuaCmdItem* item, bool sensitivity);
 
   virtual void clearBar();
   virtual void setBarLabel(const std::string& label);
   virtual void setBarOrientation(int orientation);
-
-  virtual void popUp();
 };
 
 #endif
