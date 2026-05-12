@@ -35,13 +35,14 @@ public:
   // activation/toggle
   // if toggleable you get a ToggledCB otherwise you get an ActivatedCB
   void setActivatedCB(const FFaDynCB0& dynCB) {
-    this->setToggleAble(false);
-    this->activatedCB = dynCB;
+    toggleAble = false;
+    activatedCB = dynCB;
   }
-  void invokeActivatedCB() ;
-  void setToggledCB(const FFaDynCB1<bool>& dynCB) {
-    this->setToggleAble(true);
-    this->toggledCB = dynCB;
+  void invokeActivatedCB();
+
+  void setToggledCB(const FFaDynCB1<bool>& dynCB, bool behaveAsRadio = false) {
+    toggleAble = behaveAsRadio ? 2 : 1;
+    toggledCB = dynCB;
   }
   void invokeToggledCB(bool toggled);
 
@@ -88,24 +89,15 @@ public:
   int getAccelKey() const { return this->accelKey; }
 
   bool getSensitivity();
-  // toggle
-  void setToggleAble(bool toggleable) { this->toggleAble = toggleable; }
-  bool getToggleAble() const { return this->toggleAble; }
 
-  void setToggled(bool toggle) {
-    this->setToggleAble(true);
-    this->toggled = toggle;
-  }
+  bool getToggleAble() const { return toggleAble; }
+  bool getToggleBehaveAsRadio() const { return toggleAble == 2; }
+
+  void setToggled(bool toggle) { toggled = toggle; }
   bool getToggled();
 
-  void setToggleBehaveAsRadio(bool radio) {
-    this->setToggleAble(true);
-    this->behaveAsRadio = radio; }
-  bool getToggleBehaveAsRadio() const { return this->behaveAsRadio; }
-
-  // menuButtonPopupMode
-  void setMenuButtonPopupMode(bool val) { this->menuButtonPopupMode = val; }
-  bool getMenuButtonPopupMode() const { return this->menuButtonPopupMode; }
+  void setMenuButtonPopupMode(bool val) { menuButtonPopupMode = val; }
+  bool getMenuButtonPopupMode() const { return menuButtonPopupMode; }
 
   // FFaInitializer init - used for the cmdItemMap;
   static void init();
@@ -129,8 +121,7 @@ private:
   std::string text;
   std::string toolTip;
   int  accelKey;
-  bool toggleAble;
-  bool behaveAsRadio;
+  char toggleAble;
   bool toggled;
   bool menuButtonPopupMode;
 };

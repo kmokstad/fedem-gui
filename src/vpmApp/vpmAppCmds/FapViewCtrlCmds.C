@@ -47,8 +47,7 @@ void FapViewCtrlCmds::init()
   cmdItem->setSmallIcon(solidView_xpm);
   cmdItem->setText("Solid View");
   cmdItem->setToolTip("Solid View");
-  cmdItem->setToggleBehaveAsRadio(true);
-  cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::solidView,bool));
+  cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::solidView,bool),true);
   cmdItem->setGetToggledCB(FFaDynCB1S(FapViewCtrlCmds::getSolidViewToggle,bool&));
   cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCmdsBase::isModellerActive,bool&));
 
@@ -56,8 +55,7 @@ void FapViewCtrlCmds::init()
   cmdItem->setSmallIcon(solidViewNoEdge_xpm);
   cmdItem->setText("Solid View without Edges");
   cmdItem->setToolTip("Solid View without Edges");
-  cmdItem->setToggleBehaveAsRadio(true);
-  cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::solidViewNoEdge,bool));
+  cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::solidViewNoEdge,bool),true);
   cmdItem->setGetToggledCB(FFaDynCB1S(FapViewCtrlCmds::getSolidViewNoEdgeToggle,bool&));
   cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCmdsBase::isModellerActive,bool&));
 
@@ -65,8 +63,7 @@ void FapViewCtrlCmds::init()
   cmdItem->setSmallIcon(lineView_xpm);
   cmdItem->setText("Line View");
   cmdItem->setToolTip("Line View");
-  cmdItem->setToggleBehaveAsRadio(true);
-  cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::lineView,bool));
+  cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::lineView,bool),true);
   cmdItem->setGetToggledCB(FFaDynCB1S(FapViewCtrlCmds::getLineViewToggle,bool&));
   cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCmdsBase::isModellerActive,bool&));
 
@@ -74,7 +71,6 @@ void FapViewCtrlCmds::init()
   cmdItem->setSmallIcon(flatColor_xpm);
   cmdItem->setText("Flat Colors");
   cmdItem->setToolTip("Turn off shading");
-  cmdItem->setToggleAble(true);
   cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::flatColorView,bool));
   cmdItem->setGetToggledCB(FFaDynCB1S(FapViewCtrlCmds::getFlatColorToggle,bool&));
   cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCmdsBase::isModellerActive,bool&));
@@ -83,7 +79,6 @@ void FapViewCtrlCmds::init()
   cmdItem->setSmallIcon(showTopFaces_xpm);
   cmdItem->setText("Show Top Faces");
   cmdItem->setToolTip("Show the top faces");
-  cmdItem->setToggleAble(true);
   cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::topLightOnly,bool));
   cmdItem->setGetToggledCB(FFaDynCB1S(FapViewCtrlCmds::getTopLightOnlyToggle,bool&));
   cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCmdsBase::isModellerActive,bool&));
@@ -92,8 +87,7 @@ void FapViewCtrlCmds::init()
   cmdItem->setSmallIcon(perspectiveView_xpm);
   cmdItem->setText("Perspective");
   cmdItem->setToolTip("Perspective");
-  cmdItem->setToggleBehaveAsRadio(true);
-  cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::perspectiveView,bool));
+  cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::perspectiveView,bool),true);
   cmdItem->setGetToggledCB(FFaDynCB1S(FapViewCtrlCmds::getPerspectiveViewToggle,bool&));
   cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCmdsBase::isModellerActive,bool&));
 
@@ -101,8 +95,7 @@ void FapViewCtrlCmds::init()
   cmdItem->setSmallIcon(paralellView_xpm);
   cmdItem->setText("Parallel Projection");
   cmdItem->setToolTip("Parallel Projection");
-  cmdItem->setToggleBehaveAsRadio(true);
-  cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::parallellView,bool));
+  cmdItem->setToggledCB(FFaDynCB1S(FapViewCtrlCmds::parallellView,bool),true);
   cmdItem->setGetToggledCB(FFaDynCB1S(FapViewCtrlCmds::getParallellViewToggle,bool&));
   cmdItem->setGetSensitivityCB(FFaDynCB1S(FapCmdsBase::isModellerActive,bool&));
 
