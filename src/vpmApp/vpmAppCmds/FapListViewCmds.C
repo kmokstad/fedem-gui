@@ -13,6 +13,7 @@
 #include "vpmUI/vpmUIComponents/FuiItemsListView.H"
 #include "vpmUI/vpmUIComponents/FuiItemsListViews.H"
 #include "vpmUI/Icons/FuiIconPixmaps.H"
+#include "FFuLib/FFuAuxClasses/FFuaCmdItem.H"
 
 
 void FapListViewCmds::init()

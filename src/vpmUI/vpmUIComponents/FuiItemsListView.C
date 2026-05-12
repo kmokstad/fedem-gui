@@ -223,14 +223,16 @@ void FuiItemsListView::setUICommands(const FFuaUICommands* commands)
 void FuiItemsListView::updateUICommandsSensitivity(const FFuaUICommands* commands)
 {
   for (FFuaCmdItem* cmd : static_cast<const FuaItemsLVCommands*>(commands)->popUpMenu)
-    this->popUpMenu->updateCmdItem(cmd,true);
+    if (cmd)
+      this->popUpMenu->updateCmdItem(cmd,true);
 }
 //----------------------------------------------------------------------------
 
 void FuiItemsListView::updateUICommandsToggle(const FFuaUICommands* commands)
 {
   for (FFuaCmdItem* cmd : static_cast<const FuaItemsLVCommands*>(commands)->popUpMenu)
-    this->popUpMenu->updateCmdItem(cmd,false);
+    if (cmd)
+      this->popUpMenu->updateCmdItem(cmd,false);
 }
 //----------------------------------------------------------------------------
 

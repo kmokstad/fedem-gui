@@ -144,7 +144,7 @@ FapUAMiniFileBrowser::FapUAMiniFileBrowser(FuiMiniFileBrowser* uic)
 
   popUpCmds.push_back(enableCmd);
   popUpCmds.push_back(disableCmd);
-  popUpCmds.push_back(new FFuaCmdSeparatorItem());
+  popUpCmds.push_back(new FFuaCmdItem());
   popUpCmds.push_back(deleteCmd);
 
   this->ui->setPopUpCmds(popUpCmds);

@@ -10,7 +10,6 @@
 
 #include <string>
 #include <vector>
-#include <map>
 
 #include "FFaLib/FFaDynCalls/FFaDynCB.H"
 #include "FFaLib/FFaPatterns/FFaInitialisation.H"
@@ -21,15 +20,16 @@ class FFuaCmdItem
 public:
   // A FFuaCmdItem subject to static management must have a cmdItemId string
   // otherwise it escapes the static management
-  FFuaCmdItem(const std::string& cmdItemId = "");
+  explicit FFuaCmdItem(const std::string& cmdItemId);
+  FFuaCmdItem() { this->initVars(); }
 
   // A FFuaCmdItem must not be deleted as long as it is in use
   virtual ~FFuaCmdItem();
 
   static FFuaCmdItem* getCmdItem(const std::string& cmdItemId);
-  static void enableCmdLogging(bool doEnable) { weAreLoggingCmds = doEnable; }
+  static void enableCmdLogging(bool doEnable);
 
-  const std::string& getCmdItemId() const { return this->cmdItemId; }
+  const std::string& getCmdItemId() const { return cmdItemId; }
 
   // callbacks
   // activation/toggle
@@ -46,47 +46,36 @@ public:
   }
   void invokeToggledCB(bool toggled);
 
-  void setGetSensitivityCB(const FFaDynCB1<bool&>& dynCB) {this->getSensitivityCB = dynCB;}
+  void setGetSensitivityCB(const FFaDynCB1<bool&>& cb) { getSensitivityCB = cb; }
   // If you dont set this callback you have to initiate the toggle status (setToggled)
   // You should set this cb if possible, ie if the db stores the toggle statuses
-  void setGetToggledCB(const FFaDynCB1<bool&>& dynCB) {this->getToggledCB = dynCB;}
+  void setGetToggledCB(const FFaDynCB1<bool&>& cb) { getToggledCB = cb; }
 
-private:
-  void invokeGetSensitivityCB(bool& sensitivity)
-  {this->getSensitivityCB.invoke(sensitivity);}
-  void invokeGetToggledCB(bool& toggle)
-  {this->getToggledCB.invoke(toggle);}
-
-  static void printCmdListToFile();
-
-  void initVars();
-
-public:
   // item attributes
   // icons are used in front of popupmenu text entries and on toolbuttons
   // small should be < 23 pix
   // popupmenues do always require a small icon, if not it a bigone is scaled
-  void setBigIcon(const char** pixMap) { this->bigIcon = pixMap; }
-  const char** getBigIcon() const { return this->bigIcon; }
+  void setBigIcon(const char** pixMap) { bigIcon = pixMap; }
+  const char** getBigIcon() const { return bigIcon; }
 
-  void setSmallIcon(const char** pixMap) { this->smallIcon = pixMap; }
-  const char** getSmallIcon() const { return this->smallIcon; }
+  void setSmallIcon(const char** pixMap) { smallIcon = pixMap; }
+  const char** getSmallIcon() const { return smallIcon; }
 
-  bool hasIcon() const { return this->bigIcon || this->smallIcon; }
+  bool hasIcon() const { return bigIcon || smallIcon; }
 
-  // pixmaps are used as a substitute for the text on popupmenu entries
-  void setPixmap(const char** pixMap) { this->pixmap = pixMap; }
-  const char** getPixmap() const { return this->pixmap; }
+  // pixmaps are used as a substitute for the text on popup menu entries
+  void setPixmap(const char** pixMap) { pixmap = pixMap; }
+  const char** getPixmap() const { return pixmap; }
 
-  void setText(const std::string& txt) { this->text = txt; }
-  const std::string& getText() const { return this->text; }
+  void setText(const std::string& txt) { text = txt; }
+  const std::string& getText() const { return text; }
 
-  void setToolTip(const std::string& tooltip) { this->toolTip = tooltip; }
-  const std::string& getToolTip() const { return this->toolTip; }
+  void setToolTip(const std::string& tooltip) { toolTip = tooltip; }
+  const std::string& getToolTip() const { return toolTip; }
 
-  //see FFuaKeyCode
-  void setAccelKey(int accelkey) { this->accelKey = accelkey; }
-  int getAccelKey() const { return this->accelKey; }
+  // see FFuaKeyCode
+  void setAccelKey(int accelkey) { accelKey = accelkey; }
+  int getAccelKey() const { return accelKey; }
 
   bool getSensitivity();
 
@@ -102,12 +91,10 @@ public:
   // FFaInitializer init - used for the cmdItemMap;
   static void init();
 
+protected:
+  void initVars();
+
 private:
-  typedef std::map<std::string,FFuaCmdItem*> CommandMap;
-
-  static CommandMap* cmdItemMap;
-  static bool weAreLoggingCmds;
-
   std::string cmdItemId;
 
   FFaDynCB0        activatedCB;
@@ -131,9 +118,8 @@ class FFuaCmdHeaderItem : public FFuaCmdItem
 {
 public:
   // A FFuaCmdHeaderItem is NOT book-kept (in static management)
-  FFuaCmdHeaderItem(const std::string& text = "");
-  // A FFuaCmdHeaderItem can be deleted even if it is used
-  virtual ~FFuaCmdHeaderItem() {}
+  explicit FFuaCmdHeaderItem(const std::string&) = delete;
+  FFuaCmdHeaderItem() { this->initVars(); }
 
   void push_back(FFuaCmdItem* child) { myChildren.push_back(child); }
   void clear() { myChildren.clear(); }
@@ -142,16 +128,6 @@ public:
 
 private:
   std::vector<FFuaCmdItem*> myChildren; //!< Leaf FFuaCmdItem objects
-};
-/////////////////////////////////////////////////////////////////////////////
-
-class FFuaCmdSeparatorItem : public FFuaCmdItem
-{
-public:
-  // A FFuaCmdSeparatorItem is NOT book-kept (in static management)
-  FFuaCmdSeparatorItem() {}
-  // A FFuaCmdSeparatorItem can be deleted even if it is used
-  virtual ~FFuaCmdSeparatorItem() {}
 };
 /////////////////////////////////////////////////////////////////////////////
 

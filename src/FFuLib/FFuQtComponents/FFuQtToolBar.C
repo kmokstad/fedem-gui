@@ -19,23 +19,20 @@ FFuQtToolBar::FFuQtToolBar(QWidget* parent) : QToolBar(parent)
 
 void FFuQtToolBar::insertCmdItem(FFuaCmdItem* item)
 {
-  if (dynamic_cast<FFuaCmdSeparatorItem*>(item))
-    this->addSeparator();
-  else
+  if (item)
     this->addWidget(new FFuQtToolButton(this,item));
+  else
+    this->addSeparator();
 }
 //----------------------------------------------------------------------------
 
 void FFuQtToolBar::updateCmdItem(FFuaCmdItem* item, bool sensitivity)
 {
-  if (dynamic_cast<FFuaCmdSeparatorItem*>(item)) return;
-  
   QList<QToolButton*> buttons = this->findChildren<QToolButton*>();
-  FFuToolButton* toolButton = NULL;
   for (QToolButton* obj : buttons)
-    if ((toolButton = dynamic_cast<FFuToolButton*>(obj)))
-      if (item == NULL || item == toolButton->getCmdItem())
-        toolButton->updateButton(sensitivity);
+    if (FFuToolButton* tButton = dynamic_cast<FFuToolButton*>(obj); tButton)
+      if (!item || item == tButton->getCmdItem())
+        tButton->updateButton(sensitivity);
 }
 //----------------------------------------------------------------------------
 

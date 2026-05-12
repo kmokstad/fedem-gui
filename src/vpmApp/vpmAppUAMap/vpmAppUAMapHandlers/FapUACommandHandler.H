@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "vpmApp/FapEventManager.H"
-#include "FFuLib/FFuAuxClasses/FFuaCmdItem.H"
 #include "FFuLib/FFuBase/FFuComponentBase.H"
 #include "vpmPM/FpProcessManager.H"
 #include "vpmPM/FpRDBExtractorManager.H"
@@ -22,6 +21,7 @@ class FFuMDIWindow;
 class FmAnimation;
 class FFrExtractor;
 class FFaViewItem;
+class FFuaCmdItem;
 
 
 /*!
@@ -63,9 +63,6 @@ private:
   virtual FFuaUICommands* getCommands() { return NULL; }
   // shouldn't be necessary for ordinary appl commands
   virtual void executeCommand(FFuaCmdItem*) {}
-
-protected:
-  FFuaCmdSeparatorItem separator;
 
 private:
   FFuUACommandHandler* ui;

@@ -9,6 +9,7 @@
 #define FAP_UA_RESULT_LISTVIEW_H
 
 #include "vpmApp/vpmAppUAMap/FapUAModMemListView.H"
+#include "FFuLib/FFuAuxClasses/FFuaCmdItem.H"
 
 class FmRingStart;
 
@@ -17,7 +18,6 @@ class FapUAResultListView : public FapUAModMemListView
 {
 public:
   FapUAResultListView(FuiItemsListView* ui);
-  virtual ~FapUAResultListView() {}
 
 private:
   // Callbacks for dragging and dropping on UI-item
