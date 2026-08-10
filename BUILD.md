@@ -90,41 +90,13 @@ To build and install the main component (Coin), proceed as follows:
 
 - Download the sources from [github](https://github.com/coin3d/coin).
   We have been using the release
-  [Coin 4.0.3](https://github.com/coin3d/coin/releases/tag/v4.0.3).
-  Choose the file `coin-4.0.3-src.zip`.
+  [Coin 4.0.10](https://github.com/coin3d/coin/releases/tag/v4.0.10).
+  Choose the file `coin-4.0.10-src.zip`.
+  Older releases of Coin may also be used, but note that v4.0.7 and older
+  also require the [boost](https://www.boost.org/) package.
 
 - Unzip the sources in arbitrary location,
-  e.g., `%USERPROFILE%\Fedem-src\Coin-4.0.3`.
-
-- Download the latest [boost](https://www.boost.org/) package.
-  Currently, this is
-  [boost 1.87.0](https://www.boost.org/users/history/version_1_87_0.html).
-  Choose the file `boost_1_87_0.zip`.
-  The whole package contains more than 80000 files, but Coin uses only a small
-  fraction of it. So to save time (and disk space), you may choose to extract
-  only the necessary parts. Using the `unzip` tool in a bash shell, that is:
-
-      cd ~/Fedem-src
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/*.hpp'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/assert/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/concept/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/container/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/config/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/core/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/detail/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/exception/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/iterator/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/lexical_cast/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/move/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/mpl/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/numeric/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/preprocessor/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/range/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/smart_ptr/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/type_traits/**'
-      unzip ~/Downloads/boost_1_87_0.zip 'boost_1_87_0/boost/utility/**'
-
-  This will extract less than 3000 files, which is sufficient for building Coin.
+  e.g., `%USERPROFILE%\Fedem-src\Coin-4.0.10`.
 
 - With Visual Studio 2022 Community, configure the Coin build
   by executing the following commands from a DOS shell
@@ -135,11 +107,10 @@ To build and install the main component (Coin), proceed as follows:
       call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
       "%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" ^
       -G "Visual Studio 17 2022" ^
-      -S %USERPROFILE%\Fedem-src\Coin-4.0.3 ^
+      -S %USERPROFILE%\Fedem-src\Coin-4.0.10 ^
       -B %USERPROFILE%\Coin-build\Coin4 ^
-      -DBOOST_ROOT=%USERPROFILE%\Fedem-src\boost_1_87.0 ^
-      -DCMAKE_INSTALL_PREFIX=C:\Coin-4.0.3 ^
-      -DCOIN_BUILD_TESTS=OFF -DHAVE_SOUND_OFF
+      -DCMAKE_INSTALL_PREFIX=C:\Coin-4.0.10 ^
+      -DCOIN_BUILD_TESTS=OFF -DHAVE_SOUND=OFF
       pause
 
 - Open the generated solution file `%USERPROFILE%\Coin-build\Coin4\Coin.sln`
@@ -153,11 +124,11 @@ and can therefore be built only *after* you have installed those two modules.
 To build and install SoQt, proceed as follows:
 
 - Download the sources from [github](https://github.com/coin3d/soqt).
-  Use the latest release [SoQt 1.6.3](https://github.com/coin3d/soqt/releases/tag/v1.6.3),
-  and choose the file `soqt-1.6.3-src.zip`.
+  Use the latest release [SoQt 1.6.4](https://github.com/coin3d/soqt/releases/tag/v1.6.4),
+  and choose the file `soqt-1.6.4-src.zip`.
 
 - Unzip the sources in arbitrary location,
-  e.g., `%USERPROFILE%\Fedem-src\SoQt-1.6.3`.
+  e.g., `%USERPROFILE%\Fedem-src\SoQt-1.6.4`.
 
 - With Visual Studio 2022 Community, configure the SoQt build
   by executing the following commands from a DOS shell
@@ -168,9 +139,9 @@ To build and install SoQt, proceed as follows:
       call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
       "%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" ^
       -G "Visual Studio 17 2022" ^
-      -S %USERPROFILE%\Fedem-src\SoQt-1.6.3 ^
+      -S %USERPROFILE%\Fedem-src\SoQt-1.6.4 ^
       -B %USERPROFILE%\Coin-build\SoQt1 ^
-      -DCMAKE_INSTALL_PREFIX=C:\Coin-4.0.3 ^
+      -DCMAKE_INSTALL_PREFIX=C:\Coin-4.0.10 ^
       -DCMAKE_PREFIX_PATH=C:\Qt-6.8.2 ^
       -DSOQT_BUILD_TESTS=OFF
       pause
@@ -200,7 +171,7 @@ To do this proceeed as follows:
       -G "Visual Studio 17 2022" ^
       -S %USERPROFILE%\Fedem-src\SmallChange ^
       -B %USERPROFILE%\Coin-build\SmallChange1 ^
-      -DCMAKE_INSTALL_PREFIX=C:\Coin-4.0.3 ^
+      -DCMAKE_INSTALL_PREFIX=C:\Coin-4.0.10 ^
       -DCMAKE_PREFIX_PATH=C:\Qt-6.8.2
       pause
 
@@ -231,7 +202,7 @@ those features are not important, you may skip the following installation steps:
       -G "Visual Studio 17 2022" ^
       -S %USERPROFILE%\Fedem-src\Simage-1.8.3 ^
       -B %USERPROFILE%\Coin-build\Simage1 ^
-      -DCMAKE_INSTALL_PREFIX=C:\Coin-4.0.3 ^
+      -DCMAKE_INSTALL_PREFIX=C:\Coin-4.0.10 ^
       -DSIMAGE_LIBSNDFILE_SUPPORT=OFF ^
       -DSIMAGE_OGGVORBIS_SUPPORT=OFF ^
       -DSIMAGE_BUILD_EXAMPLES=OFF ^
@@ -243,7 +214,7 @@ those features are not important, you may skip the following installation steps:
 
 - Move the `simage.h` header file into right place:
 
-      cd C:\Coin-4.0.3\include
+      cd C:\Coin-4.0.10\include
       mkdir Simage
       move simage.h Simage
 
@@ -402,7 +373,7 @@ Proceed as follows:
       @echo off
       title Fedem GUI configuration
       call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2022
-      set COIN_ROOT=C:\Coin-4.0.3
+      set COIN_ROOT=C:\Coin-4.0.10
       set QT_ROOT=C:\Qt-6.8.2
       set /p VERSION=<%USERPROFILE%\Fedem-src\fedem-gui\cfg\VERSION
       "%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" ^
