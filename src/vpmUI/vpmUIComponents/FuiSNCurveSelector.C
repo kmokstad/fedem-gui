@@ -36,13 +36,7 @@ void FuiSNCurveSelector::onStdValueChanged(int)
   if (!curveTypeMenu->selectOption(selectedCurve))
     curveTypeMenu->selectOption(0);
 
-  this->dataChangedCB.invoke();
-}
-
-
-void FuiSNCurveSelector::onCurveValueChanged(int)
-{
-  this->dataChangedCB.invoke();
+  dataChangedCB.invoke();
 }
 
 
@@ -67,21 +61,33 @@ void FuiSNCurveSelector::getValues(int& stdIdx, int& curveIdx)
 
 void FuiSNCurveSelector::setValues(int stdIdx, int curveIdx)
 {
-  int numStd = stdTypeMenu->getOptionCount();
-  if (numStd < 1) return; // The S-N standard menu has not been populated yet
+  std::vector<std::string> curveStds;
+  if (FFpSNCurveLib::allocated())
+    FFpSNCurveLib::instance()->getCurveStds(curveStds);
 
-  if (stdIdx < 0 || stdIdx >= numStd)
+  if (stdIdx < 0 || stdIdx >= static_cast<int>(curveStds.size()))
   {
     if (FFpSNCurveLib::allocated())
       std::cout <<"Warning: SN-curve library has changed since you last saved your model"
                 <<"\n         stdIdx = "<< stdIdx << std::endl;
     stdIdx = 0;
   }
+
+  stdTypeMenu->setOptions(curveStds);
   stdTypeMenu->selectOption(stdIdx);
 
-  this->populateCurveMenu(stdTypeMenu->getSelectedOptionStr());
+  this->populateCurveMenu(curveStds[stdIdx],curveIdx);
+}
 
-  if (curveIdx < 0 || curveIdx >= curveTypeMenu->getOptionCount())
+
+void FuiSNCurveSelector::populateCurveMenu(const std::string& stdName,
+					   int curveIdx)
+{
+  std::vector<std::string> curves;
+  if (FFpSNCurveLib::allocated())
+    FFpSNCurveLib::instance()->getCurveNames(curves,stdName);
+
+  if (curveIdx >= static_cast<int>(curves.size()))
   {
     if (FFpSNCurveLib::allocated())
       std::cout <<"Warning: SN-curve library has changed since you last saved your model"
@@ -89,27 +95,7 @@ void FuiSNCurveSelector::setValues(int stdIdx, int curveIdx)
     curveIdx = 0;
   }
 
-  curveTypeMenu->selectOption(curveIdx);
-}
-
-
-void FuiSNCurveSelector::onPoppedUpFromMem()
-{
-  if (!FFpSNCurveLib::allocated()) return;
-
-  std::vector<std::string> curveStds;
-  FFpSNCurveLib::instance()->getCurveStds(curveStds);
-  stdTypeMenu->setOptions(curveStds);
-
-  this->populateCurveMenu(stdTypeMenu->getSelectedOptionStr());
-}
-
-
-void FuiSNCurveSelector::populateCurveMenu(const std::string& stdName)
-{
-  if (!FFpSNCurveLib::allocated()) return;
-
-  std::vector<std::string> curves;
-  FFpSNCurveLib::instance()->getCurveNames(curves,stdName);
   curveTypeMenu->setOptions(curves);
+  if (curveIdx >= 0)
+    curveTypeMenu->selectOption(curveIdx);
 }
