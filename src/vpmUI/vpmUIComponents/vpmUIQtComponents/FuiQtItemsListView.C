@@ -30,9 +30,9 @@ void FuiQtItemsListView::setVisible(bool visible)
   this->FFuQtListView::setVisible(visible);
 
   if (!wasvisible && visible)
-    this->onPoppedUpFromMem();
+    this->onPoppedUpFromMemory();
   else if (wasvisible && !visible)
-    this->onPoppedDownToMem();
+    this->onPoppedDownToMemory();
 }
 //----------------------------------------------------------------------------
 

@@ -17,9 +17,7 @@ class FuiQtGraphView : public FFuQt2DPlotter, public FuiGraphView
 {
 public:
   FuiQtGraphView(QWidget* parent, const char* name = "FuiQtGraphView");
-  virtual ~FuiQtGraphView() { this->onPoppedDownToMem(); /*hack*/ }
-
-  virtual void setVisible(bool visible);
+  virtual ~FuiQtGraphView() { this->onPoppedDownToMemory(); }
 
 protected:
   virtual void showEvent(QShowEvent* e);
