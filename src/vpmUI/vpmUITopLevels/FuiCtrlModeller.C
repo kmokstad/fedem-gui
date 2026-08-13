@@ -7,8 +7,6 @@
 
 #include "vpmUI/vpmUITopLevels/FuiCtrlModeller.H"
 #include "vpmUI/vpmUITopLevels/FuiCtrlGridAttributes.H"
-#include "vpmUI/vpmUITopLevels/FuiMainWindow.H"
-#include "vpmUI/vpmUIComponents/FuiWorkSpace.H"
 #include "vpmUI/Fui.H"
 
 
@@ -54,11 +52,4 @@ bool FuiCtrlModeller::onClose()
 {
   this->invokeFinishedCB();
   return false;
-}
-
-
-void FuiCtrlModeller::onPoppedDownToMem()
-{
-  //TMP hack since qworkspace works badly
-  Fui::getMainWindow()->getWorkSpace()->sendWindowActivated();
 }
