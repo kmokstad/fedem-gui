@@ -33,12 +33,10 @@ public:
 protected:
   void initWidgets();
 
-  virtual void onPoppedUpFromMem();
-
 private:
-  void onStdValueChanged(int value);
-  void onCurveValueChanged(int value);
-  void populateCurveMenu(const std::string& stdName);
+  void onStdValueChanged(int);
+  void onCurveValueChanged(int) { dataChangedCB.invoke(); }
+  void populateCurveMenu(const std::string& stdName, int curveIdx = -1);
 
 protected:
   FFuOptionMenu* stdTypeMenu;
