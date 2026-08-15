@@ -64,7 +64,8 @@ void FuiMainWindow::setUICommands(const FFuaUICommands* commands)
 void FuiMainWindow::updateUICommandsSensitivity(const FFuaUICommands* commands)
 {
   for (FFuaCmdItem* cmd : static_cast<const FuaMainWindowCommands*>(commands)->menuBar)
-    this->mainMenuBar->updateCmdItem(cmd,true);
+    if (cmd)
+      this->mainMenuBar->updateCmdItem(cmd,true);
 
   for (FFuToolBar* toolbar : this->toolBars)
     toolbar->updateSensitivityOnAll();
@@ -74,7 +75,8 @@ void FuiMainWindow::updateUICommandsSensitivity(const FFuaUICommands* commands)
 void FuiMainWindow::updateUICommandsToggle(const FFuaUICommands* commands)
 {
   for (FFuaCmdItem* cmd : static_cast<const FuaMainWindowCommands*>(commands)->menuBar)
-    this->mainMenuBar->updateCmdItem(cmd,false);
+    if (cmd)
+      this->mainMenuBar->updateCmdItem(cmd,false);
 
   for (FFuToolBar* toolbar : this->toolBars)
     toolbar->updateToggleOnAll();

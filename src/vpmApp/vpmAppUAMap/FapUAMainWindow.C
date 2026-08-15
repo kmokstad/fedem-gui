@@ -30,27 +30,12 @@ FapUAMainWindow::FapUAMainWindow(FuiMainWindow* uic)
   this->ui = uic;
 
   this->fileHeader.setText("File");
-  this->fileExportHeader.setText("Export");
-  this->fileRecentHeader.setText("Recent models");
   this->editHeader.setText("Edit");
   this->viewHeader.setText("View");
-  this->viewZoomHeader.setText("Zoom");
-  this->viewZoomHeader.setSmallIcon(zoom_xpm);
-  this->viewShiftHeader.setText("Pan");
-  this->viewShiftHeader.setSmallIcon(pan_xpm);
-  this->viewPredefHeader.setText("Predefined Views");
   this->toolsHeader.setText("Tools");
   this->windpowerHeader.setText("Windpower");
   this->marineHeader.setText("Marine");
   this->mechHeader.setText("Mechanism");
-  this->mechCreateSingleJointHeader.setMenuButtonPopupMode(true);
-  this->mechCreateMultiJointHeader.setMenuButtonPopupMode(true);
-  this->mechCreateGearHeader.setMenuButtonPopupMode(true);
-  this->mechCreateSpringHeader.setMenuButtonPopupMode(true);
-  this->mechCreateTireHeader.setMenuButtonPopupMode(true);
-  this->mechCreateForceHeader.setMenuButtonPopupMode(true);
-  this->mechCreateSensorHeader.setMenuButtonPopupMode(true);
-  this->threedSymbolSizeHeader.setMenuButtonPopupMode(false);
   this->ctrlHeader.setText("Control");
   this->solveMainHeader.setText("Solve");
   this->resultHeader.setText("Result");
@@ -91,48 +76,49 @@ FFuaUICommands* FapUAMainWindow::getCommands()
 
   //file
   this->fileHeader.clear();
-  this->fileExportHeader.clear();
-  this->fileRecentHeader.clear();
 
   this->fileHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_nu"));
   this->fileHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_open"));
+
+  int i = 0;
+  this->fileRecentHeader.clear();
+  this->fileRecentHeader.setText("Recent models");
+  for (const std::string& model : FpPM::recentModels())
+    if (FFuaCmdItem* item = FFuaCmdItem::getCmdItem("cmdId_file_recent" + std::to_string(i++)); item)
+    {
+      item->setToolTip("Open the model " + model);
+      item->setText(std::to_string(i) + " " + model);
+      this->fileRecentHeader.push_back(item);
+    }
   this->fileHeader.push_back(&this->fileRecentHeader);
 
-  this->fileHeader.push_back(&this->separator);
+  this->fileHeader.push_back(NULL);
   this->fileHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_save"));
   this->fileHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_saveAs"));
 
-  this->fileHeader.push_back(&this->separator);
+  this->fileHeader.push_back(NULL);
   this->fileHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_loadLink"));
   this->fileHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_setLinkRepository"));
-  this->fileHeader.push_back(&this->separator);
+  this->fileHeader.push_back(NULL);
   this->fileHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_importBeamCS"));
-  this->fileHeader.push_back(&this->separator);
+  this->fileHeader.push_back(NULL);
   this->fileHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_importAssembly"));
 
-  this->fileHeader.push_back(&this->separator);
-  this->fileHeader.push_back(&this->fileExportHeader);
+  this->fileExportHeader.clear();
+  this->fileExportHeader.setText("Export");
   this->fileExportHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_export_exportObject"));
   this->fileExportHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_export_exportView"));
   this->fileExportHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_export_exportAnimation"));
   this->fileExportHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_export_exportAllCurves"));
   if (FapLicenseManager::hasFeature("FA-SAP")) {
-    this->fileExportHeader.push_back(&this->separator);
+    this->fileExportHeader.push_back(NULL);
     this->fileExportHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_export_exportCGeo"));
     this->fileExportHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_export_dtsDigitalTwin"));
   }
+  this->fileHeader.push_back(NULL);
+  this->fileHeader.push_back(&this->fileExportHeader);
 
-  //recent files
-  FFuaCmdItem* pCmdItem; int i = 0;
-  for (const std::string& model : FpPM::recentModels())
-    if ((pCmdItem = FFuaCmdItem::getCmdItem("cmdId_file_recent" + std::to_string(i++))))
-    {
-      pCmdItem->setToolTip("Open the model " + model);
-      pCmdItem->setText(std::to_string(i) + " " + model);
-      this->fileRecentHeader.push_back(pCmdItem);
-    }
-
-  this->fileHeader.push_back(&this->separator);
+  this->fileHeader.push_back(NULL);
   this->fileHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_exit"));
 
   //edit
@@ -144,29 +130,28 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->editHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_edit_splitBeam"));
   this->editHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_edit_orientCam"));
 
-  this->editHeader.push_back(&this->separator);
+  this->editHeader.push_back(NULL);
   this->editHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_edit_erase"));
 
   /* doesn't work properly yet
-  this->editHeader.push_back(&this->separator);
+  this->editHeader.push_back(NULL);
   this->editHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_edit_undo"));
   */
 
-  this->editHeader.push_back(&this->separator);
+  this->editHeader.push_back(NULL);
   this->editHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_listView_ensureListViewSelectedVisible"));
   this->editHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_backward_select"));
   this->editHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_forward_select"));
 
-  this->editHeader.push_back(&this->separator);
+  this->editHeader.push_back(NULL);
   this->editHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_modelPreferences"));
 
   //view
   this->viewHeader.clear();
-  this->viewZoomHeader.clear();
-  this->viewShiftHeader.clear();
-  this->viewPredefHeader.clear();
 
-  this->viewHeader.push_back(&this->viewZoomHeader);
+  this->viewZoomHeader.clear();
+  this->viewZoomHeader.setText("Zoom");
+  this->viewZoomHeader.setSmallIcon(zoom_xpm);
   this->viewZoomHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_zoomAll"));
   this->viewZoomHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_zoomTo"));
   this->viewZoomHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_zoomWindow"));
@@ -175,27 +160,31 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   */
   this->viewZoomHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_zoomIn"));
   this->viewZoomHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_zoomOut"));
+  this->viewHeader.push_back(&this->viewZoomHeader);
 
-  this->viewHeader.push_back(&this->separator);
-  this->viewHeader.push_back(&this->viewShiftHeader);
+  this->viewShiftHeader.clear();
+  this->viewShiftHeader.setText("Pan");
+  this->viewShiftHeader.setSmallIcon(pan_xpm);
   this->viewShiftHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_shiftLeft"));
   this->viewShiftHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_shiftRight"));
   this->viewShiftHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_shiftUp"));
   this->viewShiftHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_shiftDown"));
+  this->viewHeader.push_back(NULL);
+  this->viewHeader.push_back(&this->viewShiftHeader);
 
-  this->viewHeader.push_back(&this->separator);
+  this->viewHeader.push_back(NULL);
   this->viewHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_solidView"));
   this->viewHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_solidViewNoEdge"));
   this->viewHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_lineView"));
   this->viewHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_flatShadedView"));
   this->viewHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_topLightOnly"));
 
-  this->viewHeader.push_back(&this->separator);
+  this->viewHeader.push_back(NULL);
   this->viewHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_perspectiveView"));
   this->viewHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_parallellView"));
 
-  this->viewHeader.push_back(&this->separator);
-  this->viewHeader.push_back(&this->viewPredefHeader);
+  this->viewPredefHeader.clear();
+  this->viewPredefHeader.setText("Predefined Views");
   this->viewPredefHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_isometricView"));
   this->viewPredefHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_XYpZpY"));
   this->viewPredefHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_XYnZpY"));
@@ -203,8 +192,10 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->viewPredefHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_XZpYpZ"));
   this->viewPredefHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_YZpXpZ"));
   this->viewPredefHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_YZnXpZ"));
+  this->viewHeader.push_back(NULL);
+  this->viewHeader.push_back(&this->viewPredefHeader);
 
-  this->viewHeader.push_back(&this->separator);
+  this->viewHeader.push_back(NULL);
   this->viewHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mainWin_showModelManager"));
   this->viewHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mainWin_showProperties"));
 
@@ -214,14 +205,14 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->toolsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_viewFilter"));
   this->toolsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_setObjAppearance"));
 
-  this->toolsHeader.push_back(&this->separator);
+  this->toolsHeader.push_back(NULL);
   this->toolsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_objectBrowser"));
 
-  this->toolsHeader.push_back(&this->separator);
+  this->toolsHeader.push_back(NULL);
   this->toolsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_distance"));
   this->toolsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_angle"));
 
-  this->toolsHeader.push_back(&this->separator);
+  this->toolsHeader.push_back(NULL);
   if (FapLicenseManager::hasFeature("FA-CTR"))
     this->toolsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl_gridSnap"));
   this->toolsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_linkRamSettings"));
@@ -238,11 +229,11 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->windpowerHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_createTurbineAssembly"));
   this->windpowerHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_createTurbineTower"));
 
-  this->windpowerHeader.push_back(&this->separator);
+  this->windpowerHeader.push_back(NULL);
   this->windpowerHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_airEnvironment"));
 
   if (FapLicenseManager::hasFeature("FA-SEV")) {
-    this->windpowerHeader.push_back(&this->separator);
+    this->windpowerHeader.push_back(NULL);
     this->windpowerHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_createEvents"));
   }
 
@@ -251,11 +242,11 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   if (haveAddOns) {
     std::string addon;
     for (i = 0; FapToolsCmds::getAddonExe(i,addon); i++)
-      if ((pCmdItem = FFuaCmdItem::getCmdItem("cmdId_tools_addon" + std::to_string(i))))
+      if (FFuaCmdItem* item = FFuaCmdItem::getCmdItem("cmdId_tools_addon" + std::to_string(i)); item)
       {
-        pCmdItem->setToolTip(addon);
-        pCmdItem->setText(addon + "...");
-        this->addonsHeader.push_back(pCmdItem);
+        item->setToolTip(addon);
+        item->setText(addon + "...");
+        this->addonsHeader.push_back(item);
       }
   }
 
@@ -266,10 +257,10 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->marineHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_CurrFunction"));
   this->marineHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_VesselMotion"));
 
-  this->marineHeader.push_back(&this->separator);
+  this->marineHeader.push_back(NULL);
   this->marineHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_seaEnvironment"));
 
-  this->marineHeader.push_back(&this->separator);
+  this->marineHeader.push_back(NULL);
   this->marineHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_createRiser"));
   this->marineHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_createJacket"));
   this->marineHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_createPile"));
@@ -278,7 +269,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
 
   if (FapLicenseManager::hasFeature("FA-RIS")) {
     this->marineHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_mooring"));
-    this->marineHeader.push_back(&this->separator);
+    this->marineHeader.push_back(NULL);
     this->marineHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_createBeamstringPair"));
   }
 
@@ -333,15 +324,15 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createSticker"));
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_edit_eraseStickers"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_loadLink"));
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_generic_part"));
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_beams"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createTriad"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(&this->createSpiderHeader);
   this->createSpiderHeader.push_back(&this->createFlexibleSpiderHeader);
   this->createFlexibleSpiderHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_createRBE3GeomSpider"));
@@ -350,7 +341,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->createRigidSpiderHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_createRBE2GeomSpider"));
   this->createRigidSpiderHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_createRBE2GeneralSpider"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(&this->createJointHeader);
   this->createJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createRevJoint"));
   this->createJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createBallJoint"));
@@ -358,18 +349,18 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->createJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createFreeJoint"));
   this->createJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createFreeJoint2"));
 
-  this->createJointHeader.push_back(&this->separator);
+  this->createJointHeader.push_back(NULL);
   this->createJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createPrismJoint"));
   this->createJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createPrismJoint2"));
   this->createJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createCylJoint"));
   this->createJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createCylJoint2"));
   this->createJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createCamJoint"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createGear"));
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createRackPinon"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createSpring"));
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createDamper"));
 
@@ -388,7 +379,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->createDamperFunctionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_DaRotCoeff"));
   this->createDamperFunctionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_DaRotTorque"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(&this->createFrictionHeader);
   this->createFrictionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_RotFriction"));
   this->createFrictionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_TransFriction"));
@@ -397,71 +388,71 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->createFrictionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_CamFriction"));
 
   if (FapLicenseManager::hasFeature("FA-TII")) {
-    this->mechHeader.push_back(&this->separator);
+    this->mechHeader.push_back(NULL);
     this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createTire"));
     this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createRoad"));
     this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_RoadFunction"));
   }
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createForce"));
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createTorque"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(&this->createSensorHeader);
   this->createSensorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createSimpleSensor"));
   this->createSensorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createRelativeSensor"));
   this->createSensorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createAngleSensor"));
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_createStrainRosette"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_GeneralFunction"));
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_DriveFile"));
 
 #ifdef FT_HAS_EXTCTRL
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_external_ctrl_sys"));
 #endif
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_file_reference"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_GenericDBObject"));
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_MaterialProperty"));
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_BeamProperty"));
 
   int eTypes[10];
   int nTypes = FiUserElmPlugin::instance()->getElementTypes(10,eTypes);
   if (nTypes > 0) {
-    this->mechHeader.push_back(&this->separator);
+    this->mechHeader.push_back(NULL);
     this->mechHeader.push_back(&this->createUDEHeader);
     char typeName[64];
     for (i = 0; i < nTypes; i++)
-      if ((pCmdItem = FFuaCmdItem::getCmdItem("cmdId_dBCreate_UE" + std::to_string(i))))
+      if (FFuaCmdItem* item = FFuaCmdItem::getCmdItem("cmdId_dBCreate_UE" + std::to_string(i)); item)
         if (FiUserElmPlugin::instance()->getTypeName(eTypes[i],64,typeName) > 0)
         {
-          pCmdItem->setText(typeName);
-          pCmdItem->setToolTip(typeName);
-          this->createUDEHeader.push_back(pCmdItem);
+          item->setText(typeName);
+          item->setToolTip(typeName);
+          this->createUDEHeader.push_back(item);
         }
   }
 
   if (FapLicenseManager::hasFeature("FA-OWL")) {
-    this->mechHeader.push_back(&this->separator);
+    this->mechHeader.push_back(NULL);
     this->mechHeader.push_back(&this->createWellHeader);
     this->createWellHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_createPipeSurface"));
     this->createWellHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_createPipeString"));
     this->createWellHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_createDrillString"));
   }
 
-  this->mechHeader.push_back(&this->separator);
+  this->mechHeader.push_back(NULL);
   this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_Assembly"));
 
   if (FapLicenseManager::hasFeature("FA-SEV")) {
-    this->mechHeader.push_back(&this->separator);
+    this->mechHeader.push_back(NULL);
     this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_file_createEvents"));
     this->mechHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_eventDefinition"));
   }
@@ -473,51 +464,51 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_addPoint"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_removePoint"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createInput"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createOutput"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createAmplifier"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPower"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createComparator"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createAdder"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createMultiplyer"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createIntegrator"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createLimDerivator"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createTimeDelay"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createSampleHold"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createLogicalSwitch"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createLimitation"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createDeadZone"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createHysteresis"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPid"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPi"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPd"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPlimIlimD"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPIlimD"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPlimI"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPlimD"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createRealPole"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createCompConjPole"));
 
-  this->ctrlHeader.push_back(&this->separator);
+  this->ctrlHeader.push_back(NULL);
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_create1ordTF"));
   this->ctrlHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_create2ordTF"));
 
@@ -540,7 +531,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
     this->solveMainHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_solveEvents"));
   this->solveMainHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_prepareBatch"));
 
-  this->solveMainHeader.push_back(&this->separator);
+  this->solveMainHeader.push_back(NULL);
   this->solveMainHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_manageSolveStress"));
   this->solveMainHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_manageSolveModes"));
   this->solveMainHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_manageSolveRosette"));
@@ -548,7 +539,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
     this->solveMainHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_manageSolveStrainCoat"));
   this->solveMainHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_preferences"));
 
-  this->solveMainHeader.push_back(&this->separator);
+  this->solveMainHeader.push_back(NULL);
   this->solveMainHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_stopSolver"));
 #endif
 
@@ -561,13 +552,13 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_animation"));
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_graphGroup"));
 
-  this->resultHeader.push_back(&this->separator);
+  this->resultHeader.push_back(NULL);
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_graph_show"));
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_animation_show"));
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_animation_hide"));
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_animation_showControls"));
 
-  this->resultHeader.push_back(&this->separator);
+  this->resultHeader.push_back(NULL);
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_miniFileBrowser"));
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_refreshRDB"));
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_eraseSimuleRes"));
@@ -575,14 +566,14 @@ FFuaUICommands* FapUAMainWindow::getCommands()
     this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_eraseEventRes"));
 
 #ifdef FT_HAS_SOLVERS
-  this->resultHeader.push_back(&this->separator);
+  this->resultHeader.push_back(NULL);
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_deleteStressResults"));
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_deleteModesResults"));
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_deleteRosetteResults"));
   if (FapLicenseManager::hasFeature("FA-DRB"))
     this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_deleteStrainCoatResults"));
 #endif
-  this->resultHeader.push_back(&this->separator);
+  this->resultHeader.push_back(NULL);
   this->resultHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_addResultsProbe"));
 
   //windows
@@ -591,11 +582,11 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->windowsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_workSpace_cascade"));
   this->windowsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_workSpace_tile"));
 
-  this->windowsHeader.push_back(&this->separator);
+  this->windowsHeader.push_back(NULL);
   this->windowsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_workSpace_tabs"));
   this->windowsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_workSpace_subWins"));
 
-  this->windowsHeader.push_back(&this->separator);
+  this->windowsHeader.push_back(NULL);
   this->windowsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech_show"));
   if (FapLicenseManager::hasFeature("FA-CTR"))
     this->windowsHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl_show"));
@@ -606,7 +597,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
 
   this->helpHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_help_startGuide"));
 
-  this->helpHeader.push_back(&this->separator);
+  this->helpHeader.push_back(NULL);
   if (FapLicenseManager::hasUserGuide())
     this->helpHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_help_usersGuide"));
   if (FapLicenseManager::hasTheoryGuide())
@@ -615,7 +606,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
     this->helpHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_contextHelp_select"));
   if (FapLicenseManager::hasComAPIGuide())
     this->helpHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_help_comApi"));
-  this->helpHeader.push_back(&this->separator);
+  this->helpHeader.push_back(NULL);
   this->helpHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_help_about"));
 
 
@@ -628,17 +619,17 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   cmds->toolBars[FuiMainWindow::STD].push_back(FFuaCmdItem::getCmdItem("cmdId_file_open"));
   cmds->toolBars[FuiMainWindow::STD].push_back(FFuaCmdItem::getCmdItem("cmdId_file_save"));
   /* doesn't work property yet
-  cmds->toolBars[FuiMainWindow::STD].push_back(&this->separator);
+  cmds->toolBars[FuiMainWindow::STD].push_back(NULL);
   cmds->toolBars[FuiMainWindow::STD].push_back(FFuaCmdItem::getCmdItem("cmdId_edit_undo"));
   */
 
-  cmds->toolBars[FuiMainWindow::STD].push_back(&this->separator);
+  cmds->toolBars[FuiMainWindow::STD].push_back(NULL);
   cmds->toolBars[FuiMainWindow::STD].push_back(FFuaCmdItem::getCmdItem("cmdId_listView_ensureListViewSelectedVisible"));
   cmds->toolBars[FuiMainWindow::STD].push_back(FFuaCmdItem::getCmdItem("cmdId_backward_select"));
   cmds->toolBars[FuiMainWindow::STD].push_back(FFuaCmdItem::getCmdItem("cmdId_forward_select"));
   cmds->toolBars[FuiMainWindow::STD].push_back(FFuaCmdItem::getCmdItem("cmdId_edit_erase"));
 
-  cmds->toolBars[FuiMainWindow::STD].push_back(&this->separator);
+  cmds->toolBars[FuiMainWindow::STD].push_back(NULL);
   cmds->toolBars[FuiMainWindow::STD].push_back(FFuaCmdItem::getCmdItem("cmdId_tools_viewFilter"));
   cmds->toolBars[FuiMainWindow::STD].push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_setObjAppearance"));
   cmds->toolBars[FuiMainWindow::STD].push_back(FFuaCmdItem::getCmdItem("cmdId_animation_showControls"));
@@ -656,37 +647,41 @@ FFuaUICommands* FapUAMainWindow::getCommands()
 
   //SOLVE TOOLBAR
   cmds->toolBars[FuiMainWindow::SOLVE].clear();
-  this->stressHeader.clear();
-  this->modesHeader.clear();
-  this->rosetteHeader.clear();
-  this->strainCoatHeader.clear();
 
 #ifdef FT_HAS_SOLVERS
   cmds->toolBars[FuiMainWindow::SOLVE].push_back(FFuaCmdItem::getCmdItem("cmdId_solve_solveDynamicsBasic"));
 
-  cmds->toolBars[FuiMainWindow::SOLVE].push_back(&this->stressHeader);
+  this->stressHeader.clear();
+  this->stressHeader.setText("Stress Recovery");
   this->stressHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_solveStress"));
   this->stressHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_manageSolveStress"));
+  cmds->toolBars[FuiMainWindow::SOLVE].push_back(&this->stressHeader);
 
-  cmds->toolBars[FuiMainWindow::SOLVE].push_back(&this->modesHeader);
+  this->modesHeader.clear();
+  this->modesHeader.setText("Mode Shape Recovery");
   this->modesHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_solveModes"));
   this->modesHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_manageSolveModes"));
+  cmds->toolBars[FuiMainWindow::SOLVE].push_back(&this->modesHeader);
 
-  cmds->toolBars[FuiMainWindow::SOLVE].push_back(&this->rosetteHeader);
+  this->rosetteHeader.clear();
+  this->rosetteHeader.setText("Strain Rosette Recovery");
   this->rosetteHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_solveRosette"));
   this->rosetteHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_manageSolveRosette"));
+  cmds->toolBars[FuiMainWindow::SOLVE].push_back(&this->rosetteHeader);
 
   if (FapLicenseManager::hasFeature("FA-DRB")) {
-    cmds->toolBars[FuiMainWindow::SOLVE].push_back(&this->strainCoatHeader);
+    this->strainCoatHeader.clear();
+    this->strainCoatHeader.setText("Strain Coat Recovery");
     this->strainCoatHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_solveStrainCoat"));
     this->strainCoatHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_solve_manageSolveStrainCoat"));
+    cmds->toolBars[FuiMainWindow::SOLVE].push_back(&this->strainCoatHeader);
   }
 
   cmds->toolBars[FuiMainWindow::SOLVE].push_back(FFuaCmdItem::getCmdItem("cmdId_solve_solveAll"));
   if (FapLicenseManager::hasFeature("FA-SEV"))
     cmds->toolBars[FuiMainWindow::SOLVE].push_back(FFuaCmdItem::getCmdItem("cmdId_solve_solveEvents"));
 
-  cmds->toolBars[FuiMainWindow::SOLVE].push_back(&this->separator);
+  cmds->toolBars[FuiMainWindow::SOLVE].push_back(NULL);
   cmds->toolBars[FuiMainWindow::SOLVE].push_back(FFuaCmdItem::getCmdItem("cmdId_solve_stopSolver"));
   cmds->toolBars[FuiMainWindow::SOLVE].push_back(FFuaCmdItem::getCmdItem("cmdId_solve_eraseSimuleRes"));
   if (FapLicenseManager::hasFeature("FA-SEV"))
@@ -708,7 +703,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   cmds->toolBars[FuiMainWindow::VIEWCTRL].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_zoomIn"));
   cmds->toolBars[FuiMainWindow::VIEWCTRL].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_zoomOut"));
 
-  cmds->toolBars[FuiMainWindow::VIEWCTRL].push_back(&this->separator);
+  cmds->toolBars[FuiMainWindow::VIEWCTRL].push_back(NULL);
   cmds->toolBars[FuiMainWindow::VIEWCTRL].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_shiftLeft"));
   cmds->toolBars[FuiMainWindow::VIEWCTRL].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_shiftRight"));
   cmds->toolBars[FuiMainWindow::VIEWCTRL].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_shiftUp"));
@@ -733,7 +728,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_perspectiveView"));
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_parallellView"));
 
-  cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(&this->separator);
+  cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(NULL);
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(FFuaCmdItem::getCmdItem("cmdId_LinkSelection_show"));
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(FFuaCmdItem::getCmdItem("cmdId_LinkSelection_hide"));
 
@@ -741,7 +736,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->threedSymbolSizeHeader.setText("Symbol Size");
   this->threedSymbolSizeHeader.setSmallIcon(symbolSize_xpm);
   this->threedSymbolSizeHeader.setToolTip("Set symbol Size");
-  cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(&this->separator);
+  cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(NULL);
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(&this->threedSymbolSizeHeader);
   this->threedSymbolSizeHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_symbolSize0001"));
   this->threedSymbolSizeHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_symbolSize001"));
@@ -749,7 +744,7 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   this->threedSymbolSizeHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_symbolSize1"));
   this->threedSymbolSizeHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_symbolSize10"));
 
-  cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(&this->separator);
+  cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(NULL);
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_isometricView"));
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_XYpZpY"));
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_XYnZpY"));
@@ -758,84 +753,97 @@ FFuaUICommands* FapUAMainWindow::getCommands()
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_YZpXpZ"));
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_YZnXpZ"));
 
-  cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(&this->separator);
+  cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(NULL);
   cmds->toolBars[FuiMainWindow::THREEDVIEWS].push_back(FFuaCmdItem::getCmdItem("cmdId_addResultsProbe"));
 
   //MECH WIND TOOLBAR
-  cmds->toolBars[FuiMainWindow::MECHWIND].clear();
-  if (FapLicenseManager::hasFeature("FA-WND")) {
-    cmds->toolBars[FuiMainWindow::MECHWIND].push_back(FFuaCmdItem::getCmdItem("cmdId_tools_airfoilDefinition"));
-    cmds->toolBars[FuiMainWindow::MECHWIND].push_back(FFuaCmdItem::getCmdItem("cmdId_tools_bladeDefinition"));
-    cmds->toolBars[FuiMainWindow::MECHWIND].push_back(FFuaCmdItem::getCmdItem("cmdId_tools_createTurbineAssembly"));
-    cmds->toolBars[FuiMainWindow::MECHWIND].push_back(FFuaCmdItem::getCmdItem("cmdId_tools_createTurbineTower"));
-
-    cmds->toolBars[FuiMainWindow::MECHWIND].push_back(&this->separator);
-    cmds->toolBars[FuiMainWindow::MECHWIND].push_back(FFuaCmdItem::getCmdItem("cmdId_tools_airEnvironment"));
-    cmds->toolBars[FuiMainWindow::MECHWIND].push_back(FFuaCmdItem::getCmdItem("cmdId_tools_seaEnvironment"));
-  }
-  else
+  if (FapLicenseManager::hasFeature("FA-WND"))
+    cmds->toolBars[FuiMainWindow::MECHWIND] = {
+      FFuaCmdItem::getCmdItem("cmdId_tools_airfoilDefinition"),
+      FFuaCmdItem::getCmdItem("cmdId_tools_bladeDefinition"),
+      FFuaCmdItem::getCmdItem("cmdId_tools_createTurbineAssembly"),
+      FFuaCmdItem::getCmdItem("cmdId_tools_createTurbineTower"),
+      NULL,
+      FFuaCmdItem::getCmdItem("cmdId_tools_airEnvironment"),
+      FFuaCmdItem::getCmdItem("cmdId_tools_seaEnvironment")
+    };
+  else {
+    cmds->toolBars[FuiMainWindow::MECHWIND].clear();
     Fui::getMainWindow()->removeToolBar(FuiMainWindow::MECHWIND);
+  }
 
   //MECH CREATE TOOLBAR
   cmds->toolBars[FuiMainWindow::MECHCREATE].clear();
-
-  this->mechCreateSingleJointHeader.clear();
-  this->mechCreateMultiJointHeader.clear();
-  this->mechCreateGearHeader.clear();
-  this->mechCreateSpringHeader.clear();
-  this->mechCreateTireHeader.clear();
-  this->mechCreateForceHeader.clear();
-  this->mechCreateSensorHeader.clear();
-  this->mechStickerHeader.clear();
-  this->mechMoveHeader.clear();
 
   cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(FFuaCmdItem::getCmdItem("cmdId_file_loadLink"));
   cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_generic_part"));
   cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_beams"));
 
-  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->separator);
+  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(NULL);
   cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_BeamProperty"));
   cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_MaterialProperty"));
 
-  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->separator);
-  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateSingleJointHeader);
+  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(NULL);
+
+  this->mechCreateSingleJointHeader.clear();
+  this->mechCreateSingleJointHeader.setText("Point-to-point Joints");
+  this->mechCreateSingleJointHeader.setMenuButtonPopupMode(true);
   this->mechCreateSingleJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createRevJoint"));
   this->mechCreateSingleJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createBallJoint"));
   this->mechCreateSingleJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createRigidJoint"));
   this->mechCreateSingleJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createFreeJoint"));
   this->mechCreateSingleJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createFreeJoint2"));
+  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateSingleJointHeader);
 
-  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateMultiJointHeader);
+  this->mechCreateMultiJointHeader.clear();
+  this->mechCreateMultiJointHeader.setText("Point-to-path Joints");
+  this->mechCreateMultiJointHeader.setMenuButtonPopupMode(true);
   this->mechCreateMultiJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createPrismJoint"));
   this->mechCreateMultiJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createPrismJoint2"));
   this->mechCreateMultiJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createCylJoint"));
   this->mechCreateMultiJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createCylJoint2"));
   this->mechCreateMultiJointHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createCamJoint"));
+  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateMultiJointHeader);
 
-  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateGearHeader);
+  this->mechCreateGearHeader.clear();
+  this->mechCreateGearHeader.setText("Gears");
+  this->mechCreateGearHeader.setMenuButtonPopupMode(true);
   this->mechCreateGearHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createGear"));
   this->mechCreateGearHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createRackPinon"));
+  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateGearHeader);
 
-  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateSpringHeader);
+  this->mechCreateSpringHeader.clear();
+  this->mechCreateSpringHeader.setText("Axial Springs and Dampers");
+  this->mechCreateSpringHeader.setMenuButtonPopupMode(true);
   this->mechCreateSpringHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createSpring"));
   this->mechCreateSpringHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createDamper"));
+  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateSpringHeader);
 
   cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createTriad"));
 
-  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateForceHeader);
+  this->mechCreateForceHeader.clear();
+  this->mechCreateForceHeader.setText("External Forces");
+  this->mechCreateForceHeader.setMenuButtonPopupMode(true);
   this->mechCreateForceHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createForce"));
   this->mechCreateForceHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createTorque"));
+  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateForceHeader);
 
   if (FapLicenseManager::hasFeature("FA-TII")) {
-    cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateTireHeader);
+    this->mechCreateTireHeader.clear();
+    this->mechCreateTireHeader.setText("Tires and Roads");
+    this->mechCreateTireHeader.setMenuButtonPopupMode(true);
     this->mechCreateTireHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createTire"));
     this->mechCreateTireHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createRoad"));
+    cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateTireHeader);
   }
 
-  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateSensorHeader);
+  this->mechCreateSensorHeader.clear();
+  this->mechCreateSensorHeader.setText("Sensors");
+  this->mechCreateSensorHeader.setMenuButtonPopupMode(true);
   this->mechCreateSensorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createSimpleSensor"));
   this->mechCreateSensorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createRelativeSensor"));
   this->mechCreateSensorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createAngleSensor"));
+  cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(&this->mechCreateSensorHeader);
 
   cmds->toolBars[FuiMainWindow::MECHCREATE].push_back(FFuaCmdItem::getCmdItem("cmdId_createStrainRosette"));
 
@@ -846,94 +854,115 @@ FFuaUICommands* FapUAMainWindow::getCommands()
 
   cmds->toolBars[FuiMainWindow::MECHMODELLINGTOOLS].push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_attach"));
   cmds->toolBars[FuiMainWindow::MECHMODELLINGTOOLS].push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_detach"));
-  cmds->toolBars[FuiMainWindow::MECHMODELLINGTOOLS].push_back(&this->mechMoveHeader);
+
+  this->mechMoveHeader.clear();
+  this->mechMoveHeader.setText("Move Object");
   this->mechMoveHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_pointToPointMove"));
   this->mechMoveHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_allignCS"));
   this->mechMoveHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_allignRotations"));
   this->mechMoveHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_moveToCenter"));
+  cmds->toolBars[FuiMainWindow::MECHMODELLINGTOOLS].push_back(&this->mechMoveHeader);
 
   /* removed to save toolbar space (stickers not that important)
-  cmds->toolBars[FuiMainWindow::MECHMODELLINGTOOLS].push_back(&this->mechStickerHeader);
+  this->mechStickerHeader.clear();
+  this->mechStickerHeader.setText("Stickers");
   this->mechStickerHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_edit_eraseStickers"));
   this->mechStickerHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_mech3DObj_createSticker"));
+  cmds->toolBars[FuiMainWindow::MECHMODELLINGTOOLS].push_back(&this->mechStickerHeader);
   */
 
   //CTRL CREATE TOOLBAR
-  cmds->toolBars[FuiMainWindow::CTRLCREATE].clear();
-  this->ctrlCreateInputHeader.clear();
-  this->ctrlCreateAmplifierHeader.clear();
-  this->ctrlCreateComparatorHeader.clear();
-  this->ctrlCreateIntegratorHeader.clear();
-  this->ctrlCreateTimeDelayHeader.clear();
-  this->ctrlCreateLogicalSwitchHeader.clear();
-  this->ctrlCreateDeadZoneHeader.clear();
-  this->ctrlCreatePidHeader.clear();
-  this->ctrlCreatePlimIlimDHeader.clear();
-  this->ctrlCreateRealPoleHeader.clear();
-  this->ctrlCreate1ordTFHeader.clear();
-
   if (FapLicenseManager::hasFeature("FA-CTR")) {
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreateInputHeader);
+    this->ctrlCreateInputHeader.clear();
+    this->ctrlCreateInputHeader.setText("Inputs/Outputs");
     this->ctrlCreateInputHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createInput"));
     this->ctrlCreateInputHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createOutput"));
 
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreateAmplifierHeader);
+    this->ctrlCreateAmplifierHeader.clear();
+    this->ctrlCreateAmplifierHeader.setText("Amplifiers");
     this->ctrlCreateAmplifierHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createAmplifier"));
     this->ctrlCreateAmplifierHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPower"));
 
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreateComparatorHeader);
+    this->ctrlCreateComparatorHeader.clear();
+    this->ctrlCreateComparatorHeader.setText("Operators");
     this->ctrlCreateComparatorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createComparator"));
     this->ctrlCreateComparatorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createAdder"));
     this->ctrlCreateComparatorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createMultiplyer"));
 
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreateIntegratorHeader);
+    this->ctrlCreateIntegratorHeader.clear();
+    this->ctrlCreateIntegratorHeader.setText("Derivators");
     this->ctrlCreateIntegratorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createIntegrator"));
     this->ctrlCreateIntegratorHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createLimDerivator"));
 
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreateTimeDelayHeader);
+    this->ctrlCreateTimeDelayHeader.clear();
+    this->ctrlCreateTimeDelayHeader.setText("Delays");
     this->ctrlCreateTimeDelayHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createTimeDelay"));
     this->ctrlCreateTimeDelayHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createSampleHold"));
 
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreateLogicalSwitchHeader);
+    this->ctrlCreateLogicalSwitchHeader.clear();
+    this->ctrlCreateLogicalSwitchHeader.setText("Switches");
     this->ctrlCreateLogicalSwitchHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createLogicalSwitch"));
     this->ctrlCreateLogicalSwitchHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createLimitation"));
 
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreateDeadZoneHeader);
+    this->ctrlCreateDeadZoneHeader.clear();
+    this->ctrlCreateDeadZoneHeader.setText("Hysteresis");
     this->ctrlCreateDeadZoneHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createDeadZone"));
     this->ctrlCreateDeadZoneHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createHysteresis"));
 
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreatePidHeader);
+    this->ctrlCreatePidHeader.clear();
+    this->ctrlCreatePidHeader.setText("PIDs");
     this->ctrlCreatePidHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPid"));
     this->ctrlCreatePidHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPi"));
     this->ctrlCreatePidHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPd"));
 
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreatePlimIlimDHeader);
+    this->ctrlCreatePlimIlimDHeader.clear();
+    this->ctrlCreatePlimIlimDHeader.setText("Limited PIDs");
     this->ctrlCreatePlimIlimDHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPlimIlimD"));
     this->ctrlCreatePlimIlimDHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPIlimD"));
     this->ctrlCreatePlimIlimDHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPlimI"));
     this->ctrlCreatePlimIlimDHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createPlimD"));
 
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreateRealPoleHeader);
+    this->ctrlCreateRealPoleHeader.clear();
+    this->ctrlCreateRealPoleHeader.setText("Poles");
     this->ctrlCreateRealPoleHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createRealPole"));
     this->ctrlCreateRealPoleHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_createCompConjPole"));
 
-    cmds->toolBars[FuiMainWindow::CTRLCREATE].push_back(&this->ctrlCreate1ordTFHeader);
+    this->ctrlCreate1ordTFHeader.clear();
+    this->ctrlCreate1ordTFHeader.setText("Transfer Functions");
     this->ctrlCreate1ordTFHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_create1ordTF"));
     this->ctrlCreate1ordTFHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_create2ordTF"));
+
+    cmds->toolBars[FuiMainWindow::CTRLCREATE] = {
+      &this->ctrlCreateInputHeader,
+      &this->ctrlCreateAmplifierHeader,
+      &this->ctrlCreateComparatorHeader,
+      &this->ctrlCreateIntegratorHeader,
+      &this->ctrlCreateTimeDelayHeader,
+      &this->ctrlCreateLogicalSwitchHeader,
+      &this->ctrlCreateDeadZoneHeader,
+      &this->ctrlCreatePidHeader,
+      &this->ctrlCreatePlimIlimDHeader,
+      &this->ctrlCreateRealPoleHeader,
+      &this->ctrlCreate1ordTFHeader
+    };
   }
-  else
+  else {
+    cmds->toolBars[FuiMainWindow::CTRLCREATE].clear();
     Fui::getMainWindow()->removeToolBar(FuiMainWindow::CTRLCREATE);
+  }
 
   //CTRL MODELLING TOOLBAR
-  cmds->toolBars[FuiMainWindow::CTRLMODELLINGTOOLS].clear();
-  if (FapLicenseManager::hasFeature("FA-CTR")) {
-    cmds->toolBars[FuiMainWindow::CTRLMODELLINGTOOLS].push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_rotate"));
-    cmds->toolBars[FuiMainWindow::CTRLMODELLINGTOOLS].push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_addPoint"));
-    cmds->toolBars[FuiMainWindow::CTRLMODELLINGTOOLS].push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_removePoint"));
-    cmds->toolBars[FuiMainWindow::CTRLMODELLINGTOOLS].push_back(FFuaCmdItem::getCmdItem("cmdId_ctrl_gridSnap"));
-  }
-  else
+  if (FapLicenseManager::hasFeature("FA-CTR"))
+    cmds->toolBars[FuiMainWindow::CTRLMODELLINGTOOLS] = {
+      FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_rotate"),
+      FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_addPoint"),
+      FFuaCmdItem::getCmdItem("cmdId_ctrl3DObj_removePoint"),
+      FFuaCmdItem::getCmdItem("cmdId_ctrl_gridSnap")
+    };
+  else {
+    cmds->toolBars[FuiMainWindow::CTRLMODELLINGTOOLS].clear();
     Fui::getMainWindow()->removeToolBar(FuiMainWindow::CTRLMODELLINGTOOLS);
+  }
 
   return cmds;
 }

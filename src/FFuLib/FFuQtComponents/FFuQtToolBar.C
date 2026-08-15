@@ -17,36 +17,22 @@ FFuQtToolBar::FFuQtToolBar(QWidget* parent) : QToolBar(parent)
 }
 //----------------------------------------------------------------------------
 
-FFuToolButton* FFuQtToolBar::insertCmdItem(FFuaCmdItem* item)
+void FFuQtToolBar::insertCmdItem(FFuaCmdItem* item)
 {
-  if (dynamic_cast<FFuaCmdSeparatorItem*>(item))
-  {
-    // Separator item
-    this->addSeparator();
-    return NULL;
-  }
-
-  // Regular & header item
-  FFuQtToolButton* button = new FFuQtToolButton(this,item);
-  if (item->getMenuButtonPopupMode())
-    button->setPopupMode(QToolButton::MenuButtonPopup);
+  if (item)
+    this->addWidget(new FFuQtToolButton(this,item));
   else
-    button->setPopupMode(QToolButton::InstantPopup);
-  this->addWidget(button);
-  return button;
+    this->addSeparator();
 }
 //----------------------------------------------------------------------------
 
 void FFuQtToolBar::updateCmdItem(FFuaCmdItem* item, bool sensitivity)
 {
-  if (dynamic_cast<FFuaCmdSeparatorItem*>(item)) return;
-  
   QList<QToolButton*> buttons = this->findChildren<QToolButton*>();
-  FFuToolButton* toolButton = NULL;
   for (QToolButton* obj : buttons)
-    if ((toolButton = dynamic_cast<FFuToolButton*>(obj)))
-      if (item == NULL || item == toolButton->getCmdItem())
-        toolButton->updateButton(sensitivity);
+    if (FFuToolButton* tButton = dynamic_cast<FFuToolButton*>(obj); tButton)
+      if (!item || item == tButton->getCmdItem())
+        tButton->updateButton(sensitivity);
 }
 //----------------------------------------------------------------------------
 
@@ -65,11 +51,5 @@ void FFuQtToolBar::setBarLabel(const std::string& label)
 void FFuQtToolBar::setBarOrientation(int orientation)
 {
   this->setOrientation((Qt::Orientation)orientation);
-}
-//----------------------------------------------------------------------------
-
-void FFuQtToolBar::popUp()
-{
-  this->FFuQtComponentBase::popUp();
 }
 //----------------------------------------------------------------------------

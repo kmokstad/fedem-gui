@@ -7,25 +7,23 @@
 
 #include "FFuLib/FFuAuxClasses/FFuaCmdItem.H"
 
+#include <map>
 #include <iostream>
-#include <fstream>
 
 
-FFuaCmdItem::CommandMap* FFuaCmdItem::cmdItemMap = 0;
-bool FFuaCmdItem::weAreLoggingCmds = false;
+namespace
+{
+  using CommandMap = std::map<std::string,FFuaCmdItem*>;
+
+  CommandMap* cmdItemMap = NULL;
+  bool weAreLoggingCmds = false;
+}
 
 //--------------------------------------------------------------------
 
-void FFuaCmdItem::printCmdListToFile()
+void FFuaCmdItem::enableCmdLogging(bool doEnable)
 {
-  if (!cmdItemMap) return;
-
-  std::ofstream liste("FedemCmdList.txt");
-  CommandMap::const_iterator it;
-  for (it = cmdItemMap->begin(); it != cmdItemMap->end(); it++)
-    liste << "@" << it->first
-	  << "$" << it->second->getText()
-	  << "$" << it->second->getToolTip() << std::endl;
+  weAreLoggingCmds = doEnable;
 }
 //--------------------------------------------------------------------
 
@@ -34,7 +32,7 @@ void FFuaCmdItem::invokeActivatedCB()
   if (weAreLoggingCmds)
     std::cout << this->getCmdItemId() << std::endl;
 
-  this->activatedCB.invoke();
+  activatedCB.invoke();
 }
 //--------------------------------------------------------------------
 
@@ -43,7 +41,7 @@ void FFuaCmdItem::invokeToggledCB(bool toggle)
   if (weAreLoggingCmds)
     std::cout << this->getCmdItemId() << std::endl;
 
-  this->toggledCB.invoke(toggle);
+  toggledCB.invoke(toggle);
 }
 //--------------------------------------------------------------------
 
@@ -56,76 +54,61 @@ void FFuaCmdItem::init()
 
 FFuaCmdItem* FFuaCmdItem::getCmdItem(const std::string& itemId)
 {
-  if (itemId.empty() || !cmdItemMap) return 0;
+  if (itemId.empty() || !cmdItemMap)
+    return NULL;
 
-  CommandMap::iterator it = cmdItemMap->find(itemId);
-  if (it != FFuaCmdItem::cmdItemMap->end())
+  CommandMap::const_iterator it = cmdItemMap->find(itemId);
+  if (it != cmdItemMap->end())
     return it->second;
 
-  std::cerr <<"ERROR FFuaCmdItem: \""<< itemId <<"\" does not exist"
-	    << std::endl;
-  return 0;
+  std::cerr <<" *** FFuaCmdItem: \""<< itemId <<"\" does not exist"
+            << std::endl;
+  return NULL;
 }
 //----------------------------------------------------------------------------
 
 FFuaCmdItem::FFuaCmdItem(const std::string& itemId)
 {
   this->initVars();
-  this->cmdItemId = itemId;
+
   if (itemId.empty() || !cmdItemMap) return;
 
-  CommandMap::iterator it = FFuaCmdItem::cmdItemMap->find(itemId);
-  if (it != FFuaCmdItem::cmdItemMap->end()) {
-    std::cerr <<"ERROR FFuaCmdItem: \""<< itemId <<"\" already exists"
-	      << std::endl;
-    *(char*)0 = 'd'; // To make core
-  }
-  else // unique id
-    (*cmdItemMap)[itemId] = this;
+  cmdItemId = itemId;
+  if (cmdItemMap->insert({itemId,this}).second)
+    return; // unique command id
+
+  std::cerr <<" *** FFuaCmdItem: \""<< itemId <<"\" already exists"<< std::endl;
+  *(char*)0 = 'd'; // To make core
 }
 //----------------------------------------------------------------------------
 
 FFuaCmdItem::~FFuaCmdItem()
 {
-  if (!this->cmdItemId.empty() && cmdItemMap) // subject to static management
-    cmdItemMap->erase(this->cmdItemId);
+  if (!cmdItemId.empty() && cmdItemMap) // subject to static management
+    cmdItemMap->erase(cmdItemId);
 }
 //----------------------------------------------------------------------------
 
 void FFuaCmdItem::initVars()
 {
-  this->bigIcon = 0;
-  this->smallIcon = 0;
-  this->pixmap = 0;
-  this->accelKey = 0;
-  this->toggleAble = false;
-  this->behaveAsRadio = false;
-  this->toggled = false;
-  this->menuButtonPopupMode = false;
+  bigIcon = smallIcon = pixmap = NULL;
+  accelKey = 0;
+  toggleAble = toggled = menuButtonPopupMode = false;
 }
 //----------------------------------------------------------------------------
 
 bool FFuaCmdItem::getSensitivity()
 {
   bool sensitivity = true;
-  this->invokeGetSensitivityCB(sensitivity);
+  getSensitivityCB.invoke(sensitivity);
   return sensitivity;
 }
 //----------------------------------------------------------------------------
 
 bool FFuaCmdItem::getToggled()
 {
-  if (this->getToggledCB.empty())
-    return this->toggled;
-
-  bool toggle;
-  this->invokeGetToggledCB(toggle);
+  bool toggle = toggled;
+  getToggledCB.invoke(toggle);
   return toggle;
-}
-//----------------------------------------------------------------------------
-
-FFuaCmdHeaderItem::FFuaCmdHeaderItem(const std::string& txt) : FFuaCmdItem()
-{
-  this->setText(txt);
 }
 //----------------------------------------------------------------------------

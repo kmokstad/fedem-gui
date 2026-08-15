@@ -9,13 +9,13 @@
 #define FAP_UA_SIM_MODEL_LISTVIEW_H
 
 #include "FapUAModMemListView.H"
+#include "FFuLib/FFuAuxClasses/FFuaCmdItem.H"
 
 
 class FapUASimModelListView : public FapUAModMemListView
 {
 public:
   FapUASimModelListView(FuiItemsListView* ui);
-  virtual ~FapUASimModelListView() {}
 
 protected:
   // Reimplementations from FapUAItemsListView

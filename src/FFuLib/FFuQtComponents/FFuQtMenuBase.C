@@ -12,38 +12,37 @@
 
 bool FFuQtMenuBase::insertCmdItem(FFuaCmdItem* item)
 {
+  int id = 0;
   FFuaCmdHeaderItem* header = dynamic_cast<FFuaCmdHeaderItem*>(item);
-
   if (header) {
     FFuPopUpMenu* popup = new FFuQtPopUpMenu(dynamic_cast<QWidget*>(this));
-    int id = this->basicNewItem(item,popup);
-    if (!id) return false;
-    this->cmdItems[id] = item; // header cmds are book-kept
-    this->popups[id] = popup;
-    for (FFuaCmdItem* child : header->getChildren())
-      popup->insertCmdItem(child);
+    if ((id = this->basicNewItem(item,popup)) > 0)
+    {
+      this->popups[id] = popup;
+      for (FFuaCmdItem* child : header->getChildren())
+        popup->insertCmdItem(child);
+    }
   }
-  else if (dynamic_cast<FFuaCmdSeparatorItem*>(item))
+  else if (item)
+    id = this->basicNewItem(item);
+  else
     this->insertSeparator();
-  else {
-    int id = this->basicNewItem(item);
-    if (!id) return false;
-    this->cmdItems[id] = item; // real cmds are book-kept
-  }
-  return true;
+
+  if (id > 0)
+    this->cmdItems[id] = item;
+
+  return id >= 0;
 }
 
 
 void FFuQtMenuBase::updateCmdItem(FFuaCmdItem* item, bool sensitivity)
 {
-  if (dynamic_cast<FFuaCmdSeparatorItem*>(item)) return;
-
   FFuaCmdHeaderItem* header = dynamic_cast<FFuaCmdHeaderItem*>(item);
   if (header) {
-    FFuPopUpMenu* popup = this->findPopup(this->findCmdItem(item));
-    if (popup)
+    if (FFuPopUpMenu* popup = this->findPopup(this->findCmdItem(item)); popup)
       for (FFuaCmdItem* child : header->getChildren())
-        popup->updateCmdItem(child, sensitivity);
+        if (child)
+          popup->updateCmdItem(child,sensitivity);
   }
   else if (sensitivity)
     this->setItemSensitivity(this->findCmdItem(item), item->getSensitivity());

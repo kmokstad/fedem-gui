@@ -294,7 +294,7 @@ FFuaUICommands* FapUASimModelListView::getCommands()
   // Build menus
 
   cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_viewCtrl_zoomTo"));
-  cmds->popUpMenu.push_back(&this->separator);
+  cmds->popUpMenu.push_back(NULL);
 
   cmds->popUpMenu.push_back(&this->createHeader);
 
@@ -312,7 +312,7 @@ FFuaUICommands* FapUASimModelListView::getCommands()
   this->createDamperFunctionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_DaRotCoeff"));
   this->createDamperFunctionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_DaRotTorque"));
 
-  this->createHeader.push_back(&this->separator);
+  this->createHeader.push_back(NULL);
   this->createHeader.push_back(&this->createFrictionHeader);
   this->createFrictionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_RotFriction"));
   this->createFrictionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_TransFriction"));
@@ -320,7 +320,7 @@ FFuaUICommands* FapUASimModelListView::getCommands()
   this->createFrictionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_PrismFriction"));
   this->createFrictionHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_CamFriction"));
 
-  this->createHeader.push_back(&this->separator);
+  this->createHeader.push_back(NULL);
   this->createHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_GeneralFunction"));
   this->createHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_DriveFile"));
   if (FapLicenseManager::hasFeature("FA-TII"))
@@ -330,15 +330,15 @@ FFuaUICommands* FapUASimModelListView::getCommands()
     this->createHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_function_CurrFunction"));
   }
 #ifdef FT_HAS_EXTCTRL
-  this->createHeader.push_back(&this->separator);
+  this->createHeader.push_back(NULL);
   this->createHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_external_ctrl_sys"));
 #endif
-  this->createHeader.push_back(&this->separator);
+  this->createHeader.push_back(NULL);
   this->createHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_file_reference"));
-  this->createHeader.push_back(&this->separator);
+  this->createHeader.push_back(NULL);
   this->createHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_BeamProperty"));
   this->createHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_MaterialProperty"));
-  this->createHeader.push_back(&this->separator);
+  this->createHeader.push_back(NULL);
   this->createHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_Assembly"));
 
   bool convertable = false, convertableSprDa = false, convertDriveFile = false;
@@ -347,7 +347,7 @@ FFuaUICommands* FapUASimModelListView::getCommands()
   if (convertable) {
     this->convertHeader.clear();
     this->convertHeader.setText("Convert function");
-    cmds->popUpMenu.push_back(&this->separator);
+    cmds->popUpMenu.push_back(NULL);
     cmds->popUpMenu.push_back(&this->convertHeader);
 
     if (convertableSprDa) {
@@ -383,7 +383,7 @@ FFuaUICommands* FapUASimModelListView::getCommands()
 
   if (FapEventManager::isObjectOfTypeSelected(FmLink::getClassTypeID()) ||
       FapEventManager::isObjectOfTypeSelected(FmElementGroupProxy::getClassTypeID())) {
-    cmds->popUpMenu.push_back(&this->separator);
+    cmds->popUpMenu.push_back(NULL);
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_LinkSelection_hide"));
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_LinkSelection_show"));
   }
@@ -407,7 +407,7 @@ FFuaUICommands* FapUASimModelListView::getCommands()
 
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_StrainCoat_selection"));
 
-    cmds->popUpMenu.push_back(&this->separator);
+    cmds->popUpMenu.push_back(NULL);
 
     cmds->popUpMenu.push_back(&this->solveHeader);
 
@@ -426,7 +426,7 @@ FFuaUICommands* FapUASimModelListView::getCommands()
     if (FapEventManager::isObjectOfTypeSelected(FmBeam::getClassTypeID()) ||
 	FapEventManager::isObjectOfTypeSelected(FmTriad::getClassTypeID())) {
 
-      cmds->popUpMenu.push_back(&this->separator);
+      cmds->popUpMenu.push_back(NULL);
       cmds->popUpMenu.push_back(&this->resultHeader);
 
       this->resultHeader.clear();
@@ -449,29 +449,29 @@ FFuaUICommands* FapUASimModelListView::getCommands()
 
   FmRingStart* seHead = FmDB::getHead(FmSimulationEvent::getClassTypeID());
   if (FapEventManager::isTmpSelected(seHead) || FapEventManager::isPermSelected(seHead)) {
-    cmds->popUpMenu.push_back(&this->separator);
+    cmds->popUpMenu.push_back(NULL);
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_eventDefinition"));
   }
 
   if (FapEventManager::isObjectOfTypeSelected(FmSimulationModelBase::getClassTypeID()) ||
       FapEventManager::isObjectOfTypeSelected(FmSubAssembly::getClassTypeID())) {
-    cmds->popUpMenu.push_back(&this->separator);
+    cmds->popUpMenu.push_back(NULL);
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_tools_objectBrowser"));
   }
 
-  cmds->popUpMenu.push_back(&this->separator);
+  cmds->popUpMenu.push_back(NULL);
 
   cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_listView_sortListViewByID"));
   cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_listView_sortListViewByName"));
 
   if (FapEventManager::isObjectOfTypeSelected(FmSubAssembly::getClassTypeID())) {
-    cmds->popUpMenu.push_back(&this->separator);
+    cmds->popUpMenu.push_back(NULL);
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_SubassemblySelection_show"));
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_SubassemblySelection_hide"));
   }
 
   if (FapEventManager::hasTmpSelection() || FapEventManager::hasPermSelection()) {
-    cmds->popUpMenu.push_back(&this->separator);
+    cmds->popUpMenu.push_back(NULL);
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_edit_erase"));
   }
 
