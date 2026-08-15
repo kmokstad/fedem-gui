@@ -9,9 +9,6 @@
 #include "vpmUI/FuiModes.H"
 #include "vpmUI/Fui.H"
 
-#include "vpmUI/vpmUITopLevels/FuiMainWindow.H"//qtworkspace hack
-#include "vpmUI/vpmUIComponents/FuiWorkSpace.H"//qtworkspace hack
-
 #include "vpmUI/vpmUIComponents/FuiPlayPanel.H"
 #include "vpmUI/vpmUIComponents/Fui3DPoint.H"
 
@@ -28,10 +25,6 @@ FuiModeller::FuiModeller()
   myPlayPanel = NULL;
 }
 
-//////////////////////////////////////////////////////////////////////
-//
-//  Initialisation to be called from GUILib-dependent subclass constructor
-//
 
 void FuiModeller::initWidgets()
 {
@@ -44,11 +37,6 @@ void FuiModeller::initWidgets()
 }
 
 
-//////////////////////////////////////////////////////////////////////
-//
-//  Access interface :
-//
-
 void FuiModeller::mapAnimControls(bool yesOrNo)
 {
   if (yesOrNo)
@@ -60,15 +48,7 @@ void FuiModeller::mapAnimControls(bool yesOrNo)
 
 bool FuiModeller::onClose()
 {
-  //TODO introduce the finish hadler
   FuiModes::cancel();
   Fui::modellerUI(false,true);
   return false;
-}
-
-
-void FuiModeller::onPoppedDownToMem()
-{
-  //TMP hack since qworkspace works bad
-  Fui::getMainWindow()->getWorkSpace()->sendWindowActivated();
 }

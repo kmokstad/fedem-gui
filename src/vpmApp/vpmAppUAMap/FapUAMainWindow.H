@@ -11,9 +11,9 @@
 #include "vpmApp/vpmAppUAMap/vpmAppUAMapHandlers/FapUAExistenceHandler.H"
 #include "vpmApp/vpmAppUAMap/vpmAppUAMapHandlers/FapUACommandHandler.H"
 #include "vpmApp/vpmAppUAMap/vpmAppUAMapHandlers/FapUAFinishHandler.H"
+#include "FFuLib/FFuAuxClasses/FFuaCmdItem.H"
 
 class FuiMainWindow;
-class FFuaCmdHeaderItem;
 
 
 class FapUAMainWindow : public FapUAExistenceHandler,

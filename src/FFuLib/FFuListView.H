@@ -167,12 +167,6 @@ protected:
   virtual void onPoppedUp() {}
   virtual void onPoppedDown() {}
 
-  // to/from memory only
-  // called every time a ui appears on the screen (not from icon)
-  virtual void onPoppedUpFromMem() {}
-  // called when a ui is on its way to the memory (hide)
-  virtual void onPoppedDownToMem() {}
-
   void executePopUp(FFuListViewItem* listItem);
 
 protected:

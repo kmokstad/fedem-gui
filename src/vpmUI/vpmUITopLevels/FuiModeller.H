@@ -56,7 +56,6 @@ protected:
   // Reimplemented methods :
 
   virtual bool onClose();
-  virtual void onPoppedDownToMem();
 
   // Widgets :
 

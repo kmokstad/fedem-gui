@@ -56,22 +56,9 @@ FuiQtGraphView::FuiQtGraphView(QWidget* parent, const char* name)
 
   this->initWidgets();
 
-  //this->onPoppedUpFromMem();//hack -> causes crash...
-}
-//----------------------------------------------------------------------------
-
-void FuiQtGraphView::setVisible(bool visible)
-{
-  //TODO isVisible/isMinimized doesn't work on a mdi window yet,
-  //hack :onPoppedUpFrom/ToMem on construction/destr
-  //bool wasvisible = this->isVisible();
-  this->FFuQt2DPlotter::setVisible(visible);
-  /*
-  if (!wasvisible && visible)
-    this->onPoppedUpFromMem();
-  else if (wasvisible && !visible)
-    this->onPoppedDownToMem();
-  */
+  // The isVisible()/isMinimized() methods do not work on a MDI-window yet,
+  // so instead onPopped[UpFrom|DownTo]Memory() is called on constr/destr.
+  this->onPoppedUpFromMemory();
 }
 //----------------------------------------------------------------------------
 

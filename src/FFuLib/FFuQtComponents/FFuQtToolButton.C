@@ -5,8 +5,6 @@
 // This file is part of FEDEM - https://openfedem.org
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <QPixmap>
-
 #include "FFuLib/FFuAuxClasses/FFuQtAuxClasses/FFuaQtPixmapCache.H"
 #include "FFuLib/FFuAuxClasses/FFuaCmdItem.H"
 #include "FFaLib/FFaDynCalls/FFaDynCB.H"
@@ -14,67 +12,63 @@
 #include "FFuLib/FFuQtComponents/FFuQtToolButton.H"
 
 
-FFuQtToolButton::FFuQtToolButton(QWidget* parent) : QToolButton(parent)
+FFuQtToolButton::FFuQtToolButton(QWidget* parent, FFuaCmdItem* cmd)
+  : QToolButton(parent)
 {
-  this->init();
-}
+  this->setButtonWidget(this);
 
-FFuQtToolButton::FFuQtToolButton(QWidget* parent, FFuaCmdItem* cmd) : QToolButton(parent)
-{
-  this->init();
-  this->cmdItem = cmd;
-  FFuaCmdHeaderItem* header = dynamic_cast<FFuaCmdHeaderItem*>(cmd);
-
-  //header item
-  if (header) {
+  FFuaCmdHeaderItem* header = dynamic_cast<FFuaCmdHeaderItem*>(cmdItem = cmd);
+  if (header) // header item
+  {
     const std::vector<FFuaCmdItem*>& children = header->getChildren();
-    //set active
-    if (!children.empty())
-      this->setActiveCmdItem(cmd->hasIcon() ? cmd : children.front());
-    //set popup
+    if (children.empty()) return; // a header item without children does nothing
+
+    // set active command item
+    this->setActiveCmdItem(cmd->hasIcon() ? cmd : children.front());
+
+    // set popup menu
     FFuQtPopUpMenu* popup = new FFuQtPopUpMenu(dynamic_cast<QWidget*>(this));
     popup->setCommonCB(FFaDynCB1M(FFuQtToolButton,this,onPopUpSelected,FFuaCmdItem*));
     this->setMenu(popup);
     for (FFuaCmdItem* child : children)
       popup->insertCmdItem(child);
   }
-  //regular item
-  else if (!dynamic_cast<FFuaCmdSeparatorItem*>(cmd))
+  else // regular item
     this->setActiveCmdItem(cmd);
+
+  if (cmd->getMenuButtonPopupMode())
+    this->setPopupMode(QToolButton::MenuButtonPopup);
+  else
+    this->setPopupMode(QToolButton::InstantPopup);
+
+  QObject::connect(this, SIGNAL(pressed()),     this, SLOT(arm()));
+  QObject::connect(this, SIGNAL(released()),    this, SLOT(unarm()));
+  QObject::connect(this, SIGNAL(clicked()),     this, SLOT(activate()));
+  QObject::connect(this, SIGNAL(toggled(bool)), this, SLOT(toggle(bool)));
 }
+
 
 void FFuQtToolButton::updateButton(bool sensitivity)
 {
-  FFuaCmdHeaderItem* header = dynamic_cast<FFuaCmdHeaderItem*>(this->cmdItem);
+  FFuaCmdHeaderItem* header = dynamic_cast<FFuaCmdHeaderItem*>(cmdItem);
+  if (header)
+    if (FFuQtPopUpMenu* popup = dynamic_cast<FFuQtPopUpMenu*>(this->menu()); popup)
+      for (FFuaCmdItem* child : header->getChildren())
+        if (child)
+          popup->updateCmdItem(child,sensitivity);
 
-  //header item
-  if (header) {
-    //get popup
-    FFuQtPopUpMenu* popup = dynamic_cast<FFuQtPopUpMenu*>(this->menu());
-    for (FFuaCmdItem* child : header->getChildren())
-      popup->updateCmdItem(child,sensitivity);
-  }
-
-  //active item
-  if (sensitivity)
-    this->setSensitivity(this->activeCmdItem->getSensitivity());
-  else if (this->activeCmdItem->getToggleAble())
-    this->setToggle(this->activeCmdItem->getToggled());
+  if (!activeCmdItem)
+    return;
+  else if (sensitivity)
+    this->setSensitivity(activeCmdItem->getSensitivity());
+  else if (activeCmdItem->getToggleAble())
+    this->setToggle(activeCmdItem->getToggled());
 }
 
-void FFuQtToolButton::init()
-{
-  this->setButtonWidget(this);
-
-  QObject::connect(this,SIGNAL(pressed()), this, SLOT(arm()));
-  QObject::connect(this,SIGNAL(released()),this, SLOT(unarm()));
-  QObject::connect(this,SIGNAL(clicked()), this, SLOT(activate()));
-  QObject::connect(this,SIGNAL(toggled(bool)), this, SLOT(toggle(bool)));
-}
 
 void FFuQtToolButton::setActiveCmdItem(FFuaCmdItem* cmd)
 {
-  this->activeCmdItem = cmd;
+  activeCmdItem = cmd;
 
   if (cmd->getBigIcon()) {
     QIcon ic(FFuaQtPixmapCache::getPixmap(cmd->getBigIcon()));
@@ -101,16 +95,19 @@ void FFuQtToolButton::setActiveCmdItem(FFuaCmdItem* cmd)
     this->setToggle(cmd->getToggled());
 }
 
+
 void FFuQtToolButton::onPopUpSelected(FFuaCmdItem* cmd)
 {
   if (this->popupMode() != QToolButton::InstantPopup)
     this->setActiveCmdItem(cmd);
 }
 
+
 void FFuQtToolButton::setToggleAble(bool able)
 {
   this->setCheckable(able);
 }
+
 
 void FFuQtToolButton::setToggle(bool toggle)
 {
@@ -121,37 +118,31 @@ void FFuQtToolButton::setToggle(bool toggle)
   this->blockLibSignals(false);
 }
 
-void FFuQtToolButton::arm()
-{
-  this->callArmCB();
-}
-
-void FFuQtToolButton::unarm()
-{
-  this->callUnarmCB();
-}
 
 void FFuQtToolButton::activate()
 {
-  if (this->activeCmdItem->getToggleAble()) return;
+  if (!activeCmdItem || activeCmdItem->getToggleAble())
+    return;
 
   this->callActivateCB();
 
   // activeCmdItem is not toggle item
-  this->activeCmdItem->invokeActivatedCB();
+  activeCmdItem->invokeActivatedCB();
 }
+
 
 void FFuQtToolButton::toggle(bool value)
 {
-  if (!this->activeCmdItem->getToggleAble()) return;
+  if (!activeCmdItem || !activeCmdItem->getToggleAble())
+    return;
 
-  if (this->activeCmdItem->getToggleBehaveAsRadio() && !value)
+  if (activeCmdItem->getToggleBehaveAsRadio() && !value)
     this->setToggle(true);
   else
   {
     this->callToggleCB(value);
     // activeCmdItem is toggle item
-    this->activeCmdItem->setToggled(value);
-    this->activeCmdItem->invokeToggledCB(value);
+    activeCmdItem->setToggled(value);
+    activeCmdItem->invokeToggledCB(value);
   }
 }

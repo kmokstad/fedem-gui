@@ -65,7 +65,7 @@ void FuiSNCurveSelector::setValues(int stdIdx, int curveIdx)
   if (FFpSNCurveLib::allocated())
     FFpSNCurveLib::instance()->getCurveStds(curveStds);
 
-  if (stdIdx < 0 || stdIdx >= static_cast<int>(curveStds.size()))
+  if (stdIdx >= static_cast<int>(curveStds.size()))
   {
     if (FFpSNCurveLib::allocated())
       std::cout <<"Warning: SN-curve library has changed since you last saved your model"
@@ -74,9 +74,10 @@ void FuiSNCurveSelector::setValues(int stdIdx, int curveIdx)
   }
 
   stdTypeMenu->setOptions(curveStds);
-  stdTypeMenu->selectOption(stdIdx);
+  if (stdIdx >= 0)
+    stdTypeMenu->selectOption(stdIdx);
 
-  this->populateCurveMenu(curveStds[stdIdx],curveIdx);
+  this->populateCurveMenu(stdTypeMenu->getSelectedOptionStr(),curveIdx);
 }
 
 

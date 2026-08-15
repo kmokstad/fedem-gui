@@ -42,7 +42,6 @@ protected:
   void initWidgets();
 
   virtual bool onClose();
-  virtual void onPoppedDownToMem();
 
   FuiCtrlGridAttributes* myCtrlGridAttributes;
   FFuComponentBase*      myViewer;

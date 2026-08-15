@@ -435,13 +435,13 @@ FFuaUICommands* FapUAResultListView::getCommands()
   cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_graphGroup"));
 
   if (FapEventManager::isObjectOfTypeSelected(FmSubAssembly::getClassTypeID())) {
-    cmds->popUpMenu.push_back(&this->separator);
+    cmds->popUpMenu.push_back(NULL);
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_graph_enableAutoExport"));
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_graph_disableAutoExport"));
   }
 
   if (areCurvesSelected || areGraphsSelected || areAnimsSelected)
-    cmds->popUpMenu.push_back(&this->separator);
+    cmds->popUpMenu.push_back(NULL);
 
   if (areCurvesSelected || areGraphsSelected) {
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_graph_show"));
@@ -456,14 +456,14 @@ FFuaUICommands* FapUAResultListView::getCommands()
   }
 
   if (areCurvesSelected) {
-    cmds->popUpMenu.push_back(&this->separator);
+    cmds->popUpMenu.push_back(NULL);
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_graph_editXAxis"));
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_graph_editYAxis"));
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_graph_repeatCurveForAll"));
     cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_graph_repeatCurveForSome"));
   }
 
-  cmds->popUpMenu.push_back(&this->separator);
+  cmds->popUpMenu.push_back(NULL);
 
   cmds->popUpMenu.push_back(&this->importItemHeader);
   this->importItemHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_dBCreate_importedCurve"));
@@ -487,11 +487,11 @@ FFuaUICommands* FapUAResultListView::getCommands()
     this->exportItemHeader.push_back(FFuaCmdItem::getCmdItem("cmdId_export_pipeStringWear"));
   }
 
-  cmds->popUpMenu.push_back(&this->separator);
+  cmds->popUpMenu.push_back(NULL);
   cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_listView_sortListViewByID"));
   cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_listView_sortListViewByName"));
 
-  cmds->popUpMenu.push_back(&this->separator);
+  cmds->popUpMenu.push_back(NULL);
   cmds->popUpMenu.push_back(FFuaCmdItem::getCmdItem("cmdId_edit_erase"));
 
   return cmds;

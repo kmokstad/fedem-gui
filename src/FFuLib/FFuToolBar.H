@@ -12,15 +12,11 @@
 #include <string>
 
 class FFuaCmdItem;
-class FFuToolButton;
 
 
 class FFuToolBar : virtual public FFuComponentBase
 {
 public:
-  FFuToolBar() {}
-  virtual ~FFuToolBar() {}
-
   // Methods to add a CmdItem which is either a button or a separator.
   // If item is a header, a pop-up is created, parented to this, and
   // item is not book-kept (thus can be deleted). Regular items and header items
@@ -28,8 +24,7 @@ public:
   // A menu bar views only txt.
   // A pop-up menu views pixmap and txt;
   // pixmap+txt -> icon(small px) and txt, pixmap only -> (big)pixmap
-  virtual FFuToolButton* insertCmdItem(FFuaCmdItem* item) = 0;
-
+  virtual void insertCmdItem(FFuaCmdItem* item) = 0;
   virtual void updateCmdItem(FFuaCmdItem* item, bool sensitivity) = 0;
 
   void updateSensitivityOnAll() { this->updateCmdItem(NULL,true); }
