@@ -8,6 +8,22 @@
 
 # Open FEDEM Changelog
 
+## [fedem-8.1.7] (2026-08-15)
+
+### :rocket: Added
+
+- Issue https://github.com/openfedem/fedem-gui/issues/147:
+  Enable mode shape recovery on selected FE parts.
+- The Coin library used in the 3D modeler view is upgraded to version 4.0.10.
+  This also resolves some crash issues seen on newer Windows 11 computers.
+
+### :bug: Fixed
+
+- Issue https://github.com/openfedem/fedem-gui/issues/148:
+  Integration and differentiation of combined curves does not work properly.
+- Issue https://github.com/openfedem/fedem-gui/issues/151:
+  The "Standard" and "S-N curve" pulldown menus in the "Rainflow and Fatigue" tab in the Curve property panel do not work.
+
 ## [fedem-8.1.6] (2026-04-23)
 
 ### :rocket: Added
@@ -413,3 +429,4 @@ before doing this, as they are not included in the FEDEM distribution:
 [fedem-8.1.4]: https://github.com/openfedem/fedem-gui/compare/fedem-8.1.3...fedem-8.1.4
 [fedem-8.1.5]: https://github.com/openfedem/fedem-gui/compare/fedem-8.1.4...fedem-8.1.5
 [fedem-8.1.6]: https://github.com/openfedem/fedem-gui/compare/fedem-8.1.5...fedem-8.1.6
+[fedem-8.1.7]: https://github.com/openfedem/fedem-gui/compare/fedem-8.1.6...fedem-8.1.7
